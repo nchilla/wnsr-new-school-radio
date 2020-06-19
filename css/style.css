@@ -107,6 +107,9 @@ p{
 }
 
 /* episode section --------------*/
+.episode{
+  padding-bottom: var(--exmarg);
+}
 
 #abovethefold{
   position:absolute;
