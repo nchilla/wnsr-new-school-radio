@@ -1,0 +1,156 @@
+:root{
+  --tnsred:#E82E21;
+  --exmarg:40px;
+  --owidth:calc(100vw - var(--exmarg) * 2);
+  --col:calc(var(--owidth) / 12);
+  --background:white;
+  --stickdist:20px;
+}
+body{
+  min-height:2000px;
+}
+div{
+  position:relative;
+}
+/* typography-------------------- */
+h1{
+  font-family: neue-haas-unica,sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 34px;
+  line-height: 40px;
+}
+p{
+  font-family: neue-haas-unica,sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 26px;
+}
+.logo{
+  font-family: neue-display-ultra, sans-serif;
+  font-weight: 700;
+  color: var(--tnsred);
+}
+.emph{
+  color: var(--tnsred);
+}
+/* strong{
+  font-weight: 600;
+} */
+
+/* containers------------ */
+.landing{
+  width:100vw;
+  height:100vh;
+  /* border-bottom:1px solid black; */
+}
+.content{
+  width:calc(var(--col) * 10);
+  margin-left:calc(var(--col) + var(--exmarg));
+  min-height:100px;
+}
+
+/* landing text ------------------*/
+#describe{
+  width:calc(var(--col) * 11);
+  margin-left:var(--exmarg);
+  margin-top:var(--exmarg);
+  position:absolute;
+  top:0;
+  left:0;
+}
+.menu{
+  display:inline;
+  white-space: nowrap;
+}
+.section-link{
+  /* text-decoration-line: underline;
+  text-decoration-color: var(--tnsred); */
+  margin-right: 10px;
+  color:black;
+  cursor:pointer;
+}
+.section-link::before{
+  content:'→';
+
+  color:var(--tnsred);
+  text-decoration-color: var(--background);
+  text-decoration-line: underline;
+}
+.bio{
+  transition:opacity 0.3s;
+}
+
+/* navigation bar ----------------*/
+#nav{
+  z-index: 20;
+  width:100vw;
+  background-color: rgba(255,255,255,0);
+  transition:background-color 0.3s;
+  padding:20px;
+  padding-left:var(--exmarg);
+  padding-right:var(--exmarg);
+  position:fixed;
+  top:0px;
+  left:0;
+}
+.logo.fixed{
+  margin-right: 10px;
+}
+.fixed{
+  opacity:0;
+  /* transition:opacity 0.3s; */
+}
+.scroll{
+  /* transition:opacity 0.3s; */
+}
+
+/* episode section --------------*/
+
+#abovethefold{
+  position:absolute;
+  transform:translateY(-100%);
+  top:calc(var(--exmarg) * -1);
+}
+#playtoggle{
+  display:inline;
+  margin-right:40px;
+}
+#playtoggle svg{
+  position:absolute;
+  top:50%;
+  transform:translate(0%, -50%);
+  height:30px;
+  fill:var(--tnsred);
+  cursor:pointer;
+}
+.episode img{
+  width:calc(var(--col) * 3);
+  display:inline-block;
+  vertical-align: top;
+
+}
+.episode .desc{
+  box-sizing: border-box;
+  width:calc(var(--col) * 5);
+  display:inline-block;
+  vertical-align: top;
+  margin-right:var(--col);
+}
+
+
+
+
+
+
+
+
+/* media queries --------------*/
+@media(hover:hover){
+  /* on desktops and all screens where hovering is possible */
+  .section-link:hover{
+    text-decoration-line: underline;
+    text-decoration-color: var(--tnsred);
+  }
+}
