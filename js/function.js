@@ -101,26 +101,66 @@ function episode(data){
   }else{
     ep.select('.kicker').html('Play — ');
   }
-  currentAudio=new Audio(data.audio);
+
+  // liveAudio(data.audio);
+
   ep.select('#playtoggle').on('click',function(){
     toggleAudio();
-    // cast = new Audio(data.audio);
-    // cast.play();
   });
 }
+
+function liveAudio(url) {
+  var audiotag=document.querySelector('audio');
+  audiotag.src=url;
+  var context=new (window.AudioContext || window.webkitAudioContext)();
+  var source=context.createMediaElementSource(audiotag);
+  console.log(context);
+
+  //
+  // fetch(url)
+  //   .then(response => source=context.createMediaElementSource(response))
+  // console.log(context);
+  // var analyser=context.createAnalyser();
+  // source.connect(analyser);
+  // analyser.connect(context.destination);
+
+
+  // analyser.fftSize = 32;
+
+}
+
+
+
+
+
 function toggleAudio(){
   if(playing==false){
-    currentAudio.play();
-    playing=true;
+    // currentAudio.play();
+    // playing=true;
     d3.select('#playtoggle').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-1" width="70.19" height="225.09"/><rect class="cls-1" x="124.74" width="70.19" height="225.09"/></g></g></svg>');
   }else{
-    currentAudio.pause();
-    playing=false;
-      d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
+    // currentAudio.pause();
+    // playing=false;
+    d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
   }
 }
 
+// const parseAudio = url => {
+// fetch(url)
+//   .then(response => response.arrayBuffer())
+//   .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+//   .then(audioBuffer => visualize(audioBuffer));
+// };
 
+
+
+
+
+
+function visualize(audioBuffer){
+  console.log(audioBuffer);
+  console.log(audioBuffer.getChannelData(0));
+}
 
 function scrollHandle(e){
   var scroll=[document.querySelector('.logo.scroll'),document.querySelector('.menu.scroll')];
@@ -137,24 +177,15 @@ function scrollHandle(e){
       d3.select(fixed[i]).style('opacity',0);
     }
   });
-
-
-
-  // if(logodist<=20){
-  //   d3.select('.logo.scroll').style('opacity',0)
-  //   d3.select('.logo.fixed').style('opacity',1)
-  // }else{
-  //   d3.select('.logo.scroll').style('opacity',1)
-  //   d3.select('.logo.fixed').style('opacity',0)
-  // }
-  // console.log(logodist);
-  // console.log(navdist,stickdist)
-  // if(navdist<=stickdist){
-  //   d3.select('.bio').style('display','none');
-  // }else{
-  //   d3.select('.bio').style('display','inline');
-  // }
 }
+
+
+
+
+
+
+
+
 
 
 
