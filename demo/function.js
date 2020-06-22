@@ -6,6 +6,7 @@ var url='https://rss.art19.com/episodes/038a4b7b-fcd0-4e19-95bc-c0f2c44b9691.mp3
 function liveAudio(url) {
   var audiotag=document.querySelector('audio');
   audiotag.src=url;
+  audiotag.crossOrigin="anonymous";
   var context=new (window.AudioContext || window.webkitAudioContext)();
   var source=context.createMediaElementSource(audiotag);
   console.log(context);
