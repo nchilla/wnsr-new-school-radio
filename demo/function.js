@@ -15,7 +15,7 @@ function liveAudio(url) {
   analyser=context.createAnalyser();
   source.connect(analyser);
   analyser.connect(context.destination);
-  analyser.fftSize = 16384;
+  analyser.fftSize = 32;
   var bufferLength = analyser.frequencyBinCount;
   var dataArray = new Uint8Array(bufferLength);
   function updateDisplay() {
@@ -30,10 +30,9 @@ function liveAudio(url) {
 
 
 function draw(arr){
-  //the FTT array has thousands of frequencies, I'm apparently only going to use a small segment
-  var sliced=arr.slice(100,120);
+  var sliced=arr.slice(0,20);
   var max=d3.max(sliced);
-  console.log(max)
+  // console.log(max)
   var xPram=d3.scaleLinear()
     .domain([0,sliced.length-1])
     .range([0, 100]);
