@@ -1,8 +1,6 @@
 
 
 var url='https://rss.art19.com/episodes/038a4b7b-fcd0-4e19-95bc-c0f2c44b9691.mp3';
-//i think it's a problem with CORS because this URL below works fine.
-//https://s3-us-west-2.amazonaws.com/s.cdpn.io/858/outfoxing.mp3
 var audiotag=document.querySelector('audio');
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var context;
@@ -32,7 +30,6 @@ function liveAudio(url) {
 
 
 function draw(arr){
-  // console.log(arr)
   //the FTT array has thousands of frequencies, I'm apparently only going to use a small segment
   var sliced=arr.slice(100,120);
   var max=d3.max(sliced);
@@ -55,27 +52,6 @@ function draw(arr){
   d3.select('#radio')
   .datum(freq)
   .attr('d',line);
-
-
-
-
-
-
-
-  // var w=window.innerWidth;
-  // var h=window.innerHeight;
-  // var canvastag=document.querySelector('canvas');
-  // var dpr = window.devicePixelRatio || 1;
-  // var ctx=canvastag.getContext('2d');
-  // ctx.scale(dpr,dpr)
-  // canvastag.width=w;
-  // canvastag.height=h;
-  // // ctx.fillRect(0, 0, 896, 742);
-  // ctx.beginPath();
-  // ctx.moveTo(0,0);
-  // ctx.lineTo(w, h/2);
-  // ctx.lineTo(0, h);
-  // ctx.stroke();
 }
 
 
