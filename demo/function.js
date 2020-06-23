@@ -34,7 +34,7 @@ function liveAudio(url) {
 function draw(arr){
   // console.log(arr)
   //the FTT array has thousands of frequencies, I'm apparently only going to use a small segment
-  var sliced=arr.slice(100,200);
+  var sliced=arr.slice(100,120);
   var max=d3.max(sliced);
   console.log(max)
   var xPram=d3.scaleLinear()
@@ -50,7 +50,8 @@ function draw(arr){
 
   var line=d3.line()
   .x(d => xPram(d.step))
-  .y(d => 100-yPram(d.value));
+  .y(d => 100-yPram(d.value))
+  .curve(d3.curveCatmullRom.alpha(0.5));
   d3.select('#radio')
   .datum(freq)
   .attr('d',line);
