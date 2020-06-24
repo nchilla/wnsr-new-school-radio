@@ -1,6 +1,8 @@
 
 
-var url='https://rss.art19.com/episodes/64073b11-e56b-4fd2-8e3d-76d6a234db34.mp3';
+var url='https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
+//in safari it works with the link below, but not with any art19 link such as the one above.
+//https://s3-us-west-2.amazonaws.com/s.cdpn.io/858/outfoxing.mp3
 var audiotag=document.querySelector('audio');
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var context;
@@ -10,12 +12,15 @@ var source;
 var loopf;
 function connectAudio(url) {
   context=new AudioContext();
+  // context.createGain();
+  console.log(context);
   audiotag.crossOrigin="anonymous";
   audiotag.src=url;
   source=context.createMediaElementSource(audiotag);
   analyser=context.createAnalyser();
   source.connect(analyser);
   analyser.connect(context.destination);
+  analyser.smoothingTimeConstant=0.85
   analyser.fftSize = 16384;
   // startVisual();
 }
@@ -25,31 +30,19 @@ function startVisual(){
   function updateDisplay() {
     loopf=requestAnimationFrame(updateDisplay);
     analyser.getByteFrequencyData(dataArray);
-    draw(dataArray);
+    draw(dataArray.slice(100,150),-100,100);
 
   }
+
   context.resume();
+  context.onstatechange = () => console.log(context.state,analyser);
   audiotag.play();
   updateDisplay();
+  // console.log(context);
 }
 
-function staticData(){
-  statcontext=new AudioContext();
-  let currentBuffer = null;
-  fetch(url)
-    .then(response => response.arrayBuffer())
-    .then(arrayBuffer => statcontext.decodeAudioData(arrayBuffer))
-    .then(audioBuffer => use(audioBuffer));
-
-  function use(data){
-    console.log(data);
-  }
-
-}
-
-function draw(arr){
-  //the FTT array has thousands of frequencies, I'm apparently only going to use a small segment
-  var sliced=arr.slice(100,150);
+function draw(arr,min,max){
+  var sliced=arr
   var mean=d3.mean(sliced);
   sliced[0]=mean;
   sliced[sliced.length-1]=mean;
@@ -59,14 +52,11 @@ function draw(arr){
     freq.push({step:i,value:item-mean});
     vals.push(item-mean);
   });
-  var max=d3.max(vals);
-  var min=d3.min(vals);
-
   var xPram=d3.scaleLinear()
     .domain([0,sliced.length-1])
     .range([0, 100]);
   var yPram=d3.scaleLinear()
-    .domain([-100,100])
+    .domain([min,max])
     .range([25, 75]);
   var line=d3.line()
   .x(d => xPram(d.step))
@@ -77,16 +67,41 @@ function draw(arr){
   .attr('d',line);
 }
 
-
-
-document.querySelector('body').addEventListener('click',startVisual)
-
+document.querySelector('div').addEventListener('click',startVisual)
 
 window.addEventListener('load',loadit)
 function loadit(){
-  console.log(context)
+  // console.log(context)
   if(context==undefined){
-    staticData()
+    // staticData()
     connectAudio(url);
   }
 }
+
+
+// function staticData(){
+//   statcontext=new OfflineAudioContext(2,44100*40,44100);
+//   let currentBuffer = null;
+//   fetch(url)
+//     .then(response => response.arrayBuffer())
+//     .then(arrayBuffer => statcontext.decodeAudioData(arrayBuffer))
+//     .then(audioBuffer => use(audioBuffer));
+//
+//   function use(data){
+//     chan0=data.getChannelData(0);
+//     var divisions=30
+//     var segment=Math.floor(chan0.length / divisions);
+//     console.log(segment)
+//     var means=[];
+//     for(var i=0; i<divisions-1;i++){
+//       var start=i*segment;
+//       var split=chan0.slice(start,start+segment);
+//       means.push(d3.mean(split));
+//       // console.log(split);
+//     }
+//     const multiply = Math.pow(Math.max(...means), -1);
+//     means=means.map(n => n * multiply);
+//     console.log(means);
+//     draw(means,-2,2);
+//   }
+// }
