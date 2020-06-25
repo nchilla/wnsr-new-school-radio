@@ -1,20 +1,28 @@
 
 
-var url='https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
-//in safari it works with the link below, but not with any art19 link such as the one above.
-//https://s3-us-west-2.amazonaws.com/s.cdpn.io/858/outfoxing.mp3
+var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
 var audiotag=document.querySelector('audio');
 var AudioContext = window.AudioContext || window.webkitAudioContext;
+let OfflineAudioContext =window.OfflineAudioContext || window.webkitOfflineAudioContext;
 var context;
 var statcontext;
 var analyser;
 var source;
 var loopf;
+
+jQuery.ajaxPrefilter(function(options) {
+    if (options.crossDomain && jQuery.support.cors) {
+        options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
+    }
+});
+
+
 function connectAudio(url) {
   context=new AudioContext();
   // context.createGain();
   console.log(context);
   audiotag.crossOrigin="anonymous";
+  audiotag.preload="auto";
   audiotag.src=url;
   source=context.createMediaElementSource(audiotag);
   analyser=context.createAnalyser();
@@ -34,11 +42,10 @@ function startVisual(){
 
   }
 
+    // context.resume();
   context.resume();
-  context.onstatechange = () => console.log(context.state,analyser);
-  audiotag.play();
   updateDisplay();
-  // console.log(context);
+  audiotag.play();
 }
 
 function draw(arr,min,max){
@@ -67,7 +74,19 @@ function draw(arr,min,max){
   .attr('d',line);
 }
 
-document.querySelector('div').addEventListener('click',startVisual)
+var started=0
+function starter(){
+  if(started==0){
+    started++
+    startVisual()
+  }else{
+    audiotag.currentTime=audiotag.currentTime+20;
+  }
+}
+
+
+
+document.querySelector('div').addEventListener('click',starter)
 
 window.addEventListener('load',loadit)
 function loadit(){
@@ -88,6 +107,7 @@ function loadit(){
 //     .then(audioBuffer => use(audioBuffer));
 //
 //   function use(data){
+//     console.log(data);
 //     chan0=data.getChannelData(0);
 //     var divisions=30
 //     var segment=Math.floor(chan0.length / divisions);
