@@ -31,7 +31,6 @@
       <div id='describe' class='noselect'>
         <h1>
           <span class='logo scroll'>WNSR</span>
-          <!-- <span class='mobile break'><br></span> -->
           <span class='bio'>
             <strong>New School Radio</strong> is The New School’s only student-run media platform. Founded in 2007 and expanding every year, WNSR is a space for the New School community to play their music, share their work, and speak their minds.
           </span>
@@ -52,12 +51,27 @@
           <span class='kicker emph'></span>
           <span class='title'></span>
         </h1>
+        <input class="seekbar" type="range" min="0" max="100" value="0" step='0.1'></input>
       </div>
-      <input class="seekbar" type="range" min="0" max="100" value="0" step='0.1'></input>
-      <p class='desc'></p>
+
+      <p class='desc'>
+        <span class='information'></span>
+      </p>
       <img>
     </div>
-    <!-- <audio controls></audio> -->
+    <div id='shows' class="content">
+      <h1 class='sec-head'>Our Shows</h1>
+      <!-- <div class="show"></div> -->
+    </div>
+    <div id='about' class="content">
+      <h1 class='sec-head'>About</h1>
+      <p>
+        <span>Sed non nulla ullamcorper, molestie purus a, iaculis turpis. Sed ligula nulla, facilisis facilisis orci vel, sodales maximus orci. Etiam fermentum posuere leo, nec semper nisl viverra ac. Pellentesque non imperdiet massa. </span>
+      </p>
+      <img src='aboutimg.jpg'>
+      <!-- <div class="show"></div> -->
+    </div>
+
     <!-- js links -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script

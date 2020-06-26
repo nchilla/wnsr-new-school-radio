@@ -8,6 +8,8 @@ var rssobj=[];
 var allepisodes=[];
 var currentAudio;
 var playing=false;
+var showDesc=true;
+var currentPage=1;
 
 //audiocontext definitions
 var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
@@ -76,10 +78,10 @@ function domToObj(){
   b = new Date(b.pubDate);
   return a>b ? -1 : a<b ? 1 : 0;
   });
-  episode(allepisodes[0])
-  console.log(allepisodes[0]);
-  console.log(rssobj);
-  // console.log(rssdoms[0])
+  buildShows();
+  episode(allepisodes[0]);
+
+
 }
 
 //RSS parsing tools---------------
@@ -107,13 +109,15 @@ function episode(data){
   var ep=d3.select('.episode');
   ep.datum(data);
   ep.select('.title').html(data.title);
-  ep.select('.desc').html(data.summary);
+  showDesc=true;
+  toggleText();
   ep.select('img').attr('src',data.image);
   if(data==allepisodes[0]){
     ep.select('.kicker').html('Latest — ');
   }else{
     ep.select('.kicker').html('Play — ');
   }
+  atpresent=0;
   connectAudio(data.audio)
   // liveAudio(data.audio);
 
@@ -122,6 +126,28 @@ function episode(data){
   });
 }
 
+function toggleText(){
+  var ep=d3.select('.episode');
+  var epdata=ep.datum()
+  if(showDesc==true){
+    ep.select('.information')
+    .html(epdata.summary)
+    .append('span')
+    .attr('class','togglesummary')
+    .html('more info');
+    showDesc=false;
+  }else{
+    ep.select('.information')
+    .html(epdata.description)
+    .append('span')
+    .attr('class','togglesummary')
+    .html('collapse info');
+    showDesc=true;
+  }
+  ep.select('.togglesummary').on('click',function(){
+    toggleText();
+  })
+}
 
 function toggleAudio(){
   if(audiotag.paused){
@@ -140,18 +166,27 @@ function toggleAudio(){
 function connectAudio(url) {
   context=new AudioContext();
   // context.createGain();
-  console.log(context);
   audiotag.crossOrigin="anonymous";
   audiotag.preload="auto";
   audiotag.src=url;
-  source=context.createMediaElementSource(audiotag);
-  analyser=context.createAnalyser();
-  source.connect(analyser);
-  analyser.connect(context.destination);
-  analyser.smoothingTimeConstant=0.85
-  analyser.fftSize = 16384;
+  if(activated==false){
+    source=context.createMediaElementSource(audiotag);
+    analyser=context.createAnalyser();
+    source.connect(analyser);
+    analyser.connect(context.destination);
+    analyser.smoothingTimeConstant=0.85
+    analyser.fftSize = 16384;
+  }
   audiotag.currentTime=atpresent;
-  audiotag.addEventListener('timeupdate', function(e){updateTrack(e);});
+  audiotag.addEventListener('timeupdate', function(e){updateTrack();});
+  audiotag.addEventListener('ended',function(e){
+    atpresent=0;
+    audiotag.currentTime=atpresent;
+    updateTrack();
+    audiotag.pause();
+    d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
+    // toggleAudio();
+  })
   activated=true;
   // startVisual();
 }
@@ -200,11 +235,13 @@ function draw(arr,min,max){
 
 }
 
-function updateTrack(e){
+function updateTrack(){
   var newVal=audiotag.currentTime/audiotag.duration*100;
+  if(isNaN(newVal)){
+    newVal=0;
+  }
   d3.select('.seekbar').property('value',newVal);
-  // console.log(e.timeStamp/audiotag.duration)
-  // console.log(e);
+
 }
 document.querySelector('.seekbar').addEventListener('change',function(e){
   var newVal=d3.select('.seekbar').property('value')/100*audiotag.duration;
@@ -213,6 +250,105 @@ document.querySelector('.seekbar').addEventListener('change',function(e){
   }
   atpresent=newVal;
 })
+
+function buildShows(){
+  var sorted=rssobj.sort(function(a,b){
+    if(a.title==allepisodes[0].series){
+      return -1;
+    }else{
+      return 0;
+    }
+  })
+  var shows=d3.select('#shows')
+  sorted.forEach((item, i) => {
+    shows.append('div').attr('class','show').datum(item);
+    var theshow=d3.select(document.querySelectorAll('.show')[i]);
+    if(i==0){theshow.attr('id','focused')};
+    theshow.append('img').attr('src',item.image).attr('class','focus-img');
+    theshow.append('p').append('span').attr('class','show-title').html(item.title);
+    theshow.select('p').append('span').attr('class','show-expand episodes')
+    theshow.select('p').append('span').attr('class','show-expand pageflip noselect')
+    .append('span').attr('class','backflip').html('back');
+    theshow.select('.pageflip').append('span').attr('class','nextflip').html('more');
+    var sExpand=theshow.select('.episodes')
+    sExpand.append('span').html(item.description);
+    var pagecounter=1;
+    var epcounter=0;
+    item.episodes.forEach((ep, e) => {
+      sExpand.append('span')
+      .attr('class','ep-preview epwave'+pagecounter)
+      .datum(ep)
+      .html(ep.title);
+      epcounter++;
+      if(epcounter>4){
+        pagecounter++;
+        epcounter=0;
+      }
+    });
+    d3.selectAll('.epwave1').classed('epshowing',true)
+    theshow.datum().pagecount=pagecounter;
+  });
+  d3.selectAll('.show').on('click',function(event){
+    if(event.title!==d3.select('#focused').datum().title){
+      d3.select('#focused').attr('id','');
+      var thetarget=d3.selectAll('.show').filter(function(d,i){if(d.title==event.title){return true}})
+      thetarget.attr('id','focused');
+      pageControls(1);
+    }
+  })
+  d3.selectAll('.ep-preview').on('click',function(event){
+    if(!audiotag.paused){
+      toggleAudio()
+    }
+    episode(event);
+    atpresent=0;
+    audiotag.currentTime=atpresent;
+    updateTrack();
+    toggleAudio();
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+    // d3.select('.seekbar').property('value',0);
+  })
+  d3.selectAll('.nextflip').on('click',function(event){
+    pageControls('next');
+  })
+  d3.selectAll('.backflip').on('click',function(event){
+    pageControls('back');
+  })
+
+}
+
+
+
+
+
+function pageControls(dir){
+  var focused=d3.select('#focused')
+
+  if(dir=='next'){
+    currentPage++;
+  }else if(dir=='back'){
+    currentPage--;
+  }else{
+    currentPage=dir;
+  }
+  toPage=currentPage;
+  d3.selectAll('.epshowing').classed('epshowing',false);
+  d3.selectAll('.epwave'+toPage).classed('epshowing',true);
+  focused.select('.nextflip').style('display','inline');
+  focused.select('.backflip').style('display','inline');
+  if(focused.datum().pagecount<2){
+    focused.select('.nextflip').style('display','none');
+    focused.select('.backflip').style('display','none');
+  }else if(currentPage==focused.datum().pagecount){
+    focused.select('.nextflip').style('display','none');
+  }else if(currentPage==1){
+    focused.select('.backflip').style('display','none');
+  }
+}
 
 
 
