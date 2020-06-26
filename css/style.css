@@ -1,12 +1,16 @@
 :root{
-  --tnsred:#E82E21;
+  --redcomp:232,46,33;
+  --tnsred:rgba(var(--redcomp),1);
+  --gray:rgba(0,0,0,0.2);
   --exmarg:40px;
   --owidth:calc(100vw - var(--exmarg) * 2);
   --col:calc(var(--owidth) / 12);
   --background:white;
   --stickdist:20px;
 }
+
 body{
+  width:100%;
   /* min-height:2000px; */
 }
 div{
@@ -121,11 +125,20 @@ p{
 
 /* episode section --------------*/
 .episode{
+  display:flex;
+  flex-flow:row nowrap;
+  justify-content: space-between;
   padding-bottom: var(--exmarg);
+}
+.seekbar{
+  position:absolute;
+  top:0;
+  left:0;
 }
 
 #abovethefold{
   position:absolute;
+  width:calc(var(--col) * 10);
   transform:translateY(-100%);
   top:calc(var(--exmarg) * -1);
 }
@@ -152,10 +165,29 @@ p{
   width:calc(var(--col) * 5);
   display:inline-block;
   vertical-align: top;
+  margin-top:20px;
   margin-right:var(--col);
 }
 
-
+/* svg wave ------------------ */
+#wave{
+  left:0;
+  position:fixed;
+  width:100%;
+  top:20%;
+  height:80%;
+  pointer-events: none;
+}
+#wave path{
+  fill:none;
+  stroke-width:3px;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+  pointer-events: visibleStroke;
+  stroke-opacity:1;
+  transition:stroke-opacity 0.3s;
+  stroke:#E82E21;
+}
 
 
 
@@ -170,3 +202,71 @@ p{
     text-decoration-color: var(--tnsred);
   }
 }
+@media(max-width:768px){
+  :root{
+    --exmarg:30px;
+  }
+  #describe{
+    width:var(--owidth);
+  }
+  .content{
+    width:var(--owidth);
+    margin-left: var(--exmarg);
+  }
+  .bio{
+    margin-right:0;
+    width:100%;
+  }
+  .episode{
+    flex-flow: column nowrap;
+  }
+  .episode img{
+    order:1;
+    width:100%;
+  }
+  .episode .desc{
+    width:100%;
+    order:2;
+    margin-right:0;
+  }
+  h1{
+    font-size:30px;
+    line-height: 36px;
+  }
+}
+
+
+/* clear styles on seekbar */
+input[type=range]{
+    margin:0;
+    width:100%;
+    -webkit-appearance: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height: 3px;
+    background-color:rgba(var(--redcomp),0.2);
+    /* background: #ddd;
+    border: none;
+    border-radius: 3px; */
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    /* height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    margin-top: -4px; */
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #ccc;
+}
+input[type=range]::-moz-focus-outer {
+    border: 0;
+    }

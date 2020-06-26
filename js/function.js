@@ -1,9 +1,5 @@
 
 //starting definitions---------------------------
-
-//values of css variables
-//.setProperty('--var',set);
-//.getPropertyValue('--var')
 var root = getComputedStyle(document.documentElement);
 var stickdist=root.getPropertyValue('--stickdist').slice(0,2);
 var rsslinks=['https://rss.art19.com/memories-through-sound','https://rss.art19.com/new-school-arts-culture','https://rss.art19.com/new-school-news'];
@@ -12,6 +8,20 @@ var rssobj=[];
 var allepisodes=[];
 var currentAudio;
 var playing=false;
+
+//audiocontext definitions
+var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
+var audiotag=document.querySelector('audio');
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+let OfflineAudioContext =window.OfflineAudioContext || window.webkitOfflineAudioContext;
+var context;
+var statcontext;
+var analyser;
+var source;
+var loopf;
+var visualEngage=false;
+
+
 
 function startUp(){
   rsslinks.forEach((item, i) => {
@@ -101,7 +111,7 @@ function episode(data){
   }else{
     ep.select('.kicker').html('Play — ');
   }
-
+  connectAudio(data.audio)
   // liveAudio(data.audio);
 
   ep.select('#playtoggle').on('click',function(){
@@ -109,58 +119,81 @@ function episode(data){
   });
 }
 
-function liveAudio(url) {
-  var audiotag=document.querySelector('audio');
-  audiotag.src=url;
-  var context=new (window.AudioContext || window.webkitAudioContext)();
-  var source=context.createMediaElementSource(audiotag);
-  console.log(context);
-
-  //
-  // fetch(url)
-  //   .then(response => source=context.createMediaElementSource(response))
-  // console.log(context);
-  // var analyser=context.createAnalyser();
-  // source.connect(analyser);
-  // analyser.connect(context.destination);
-
-
-  // analyser.fftSize = 32;
-
-}
-
-
-
-
 
 function toggleAudio(){
-  if(playing==false){
-    // currentAudio.play();
-    // playing=true;
+  if(audiotag.paused){
+    if(visualEngage==false){
+      startVisual();
+      visualEngage=true;
+    }
+    audiotag.play();
     d3.select('#playtoggle').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-1" width="70.19" height="225.09"/><rect class="cls-1" x="124.74" width="70.19" height="225.09"/></g></g></svg>');
   }else{
-    // currentAudio.pause();
-    // playing=false;
+    audiotag.pause();
     d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
   }
 }
 
-// const parseAudio = url => {
-// fetch(url)
-//   .then(response => response.arrayBuffer())
-//   .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-//   .then(audioBuffer => visualize(audioBuffer));
-// };
-
-
-
-
-
-
-function visualize(audioBuffer){
-  console.log(audioBuffer);
-  console.log(audioBuffer.getChannelData(0));
+function connectAudio(url) {
+  context=new AudioContext();
+  // context.createGain();
+  console.log(context);
+  audiotag.crossOrigin="anonymous";
+  audiotag.preload="auto";
+  audiotag.src=url;
+  source=context.createMediaElementSource(audiotag);
+  analyser=context.createAnalyser();
+  source.connect(analyser);
+  analyser.connect(context.destination);
+  analyser.smoothingTimeConstant=0.85
+  analyser.fftSize = 16384;
+  // startVisual();
 }
+function startVisual(){
+  var bufferLength = analyser.frequencyBinCount;
+  var dataArray = new Uint8Array(bufferLength);
+  function updateDisplay() {
+    loopf=requestAnimationFrame(updateDisplay);
+    analyser.getByteFrequencyData(dataArray);
+    draw(dataArray.slice(100,150),-100,100);
+
+  }
+
+    // context.resume();
+  context.resume();
+  updateDisplay();
+  // audiotag.play();
+}
+function draw(arr,min,max){
+  var sliced=arr
+  var mean=d3.mean(sliced);
+  sliced[0]=mean;
+  sliced[sliced.length-1]=mean;
+  var freq=[];
+  var vals=[];
+  sliced.forEach((item, i) => {
+    freq.push({step:i,value:item-mean});
+    vals.push(item-mean);
+  });
+  var xPram=d3.scaleLinear()
+    .domain([0,sliced.length-1])
+    .range([0, 100]);
+  var yPram=d3.scaleLinear()
+    .domain([min,max])
+    .range([25, 75]);
+  var line=d3.line()
+  .x(d => xPram(d.step))
+  .y(d => 100-yPram(d.value))
+  .curve(d3.curveCatmullRom.alpha(0.5));
+  d3.select('#wave').select('path')
+  .datum(freq)
+  .attr('d',line);
+}
+
+
+
+
+
 
 function scrollHandle(e){
   var scroll=[document.querySelector('.logo.scroll'),document.querySelector('.menu.scroll')];

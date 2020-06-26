@@ -12,8 +12,10 @@
     <link rel="stylesheet" href="https://fonts.newschool.edu/fonts/fonts.css">
   </head>
   <body>
-
-    <canvas id="wave"></canvas>
+    <audio type="audio/mpeg"></audio>
+    <svg id='wave' vector-effect='non-scaling-stroke' viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path vector-effect='non-scaling-stroke'>
+    </svg>
     <div id='nav'>
       <h1>
         <span class='logo fixed'>WNSR</span>
@@ -49,6 +51,7 @@
           <span class='title'></span>
         </h1>
       </div>
+      <input class="seekbar" type="range" min="0" max="100"></input>
       <p class='desc'></p>
       <img>
     </div>

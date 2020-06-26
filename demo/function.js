@@ -1,6 +1,6 @@
 
 
-var url='https://rss.art19.com/episodes/c08e9885-d882-4306-a4d4-bd7a7bd76db6.mp3';
+var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
 var audiotag=document.querySelector('audio');
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 let OfflineAudioContext =window.OfflineAudioContext || window.webkitOfflineAudioContext;
@@ -10,11 +10,7 @@ var analyser;
 var source;
 var loopf;
 
-jQuery.ajaxPrefilter(function(options) {
-    if (options.crossDomain && jQuery.support.cors) {
-        options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
-    }
-});
+
 
 
 function connectAudio(url) {
