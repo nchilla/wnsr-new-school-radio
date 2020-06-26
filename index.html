@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta http-equiv="Content-Type" content="text/html;" charset="utf-8" >
-    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1">
+  <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1">
     <title>WNSR New School Radio</title>
     <!-- stylesheets -->
     <link rel="stylesheet" href="css/clearstyle.css" type="text/css">
@@ -14,7 +14,8 @@
   <body>
     <audio type="audio/mpeg"></audio>
     <svg id='wave' vector-effect='non-scaling-stroke' viewBox="0 0 100 100" preserveAspectRatio="none">
-      <path vector-effect='non-scaling-stroke'>
+      <path vector-effect='non-scaling-stroke' d='m 0 50 l 100 0'></path>
+      <!-- <path vector-effect='non-scaling-stroke'></path> -->
     </svg>
     <div id='nav'>
       <h1>
@@ -30,6 +31,7 @@
       <div id='describe' class='noselect'>
         <h1>
           <span class='logo scroll'>WNSR</span>
+          <!-- <span class='mobile break'><br></span> -->
           <span class='bio'>
             <strong>New School Radio</strong> is The New School’s only student-run media platform. Founded in 2007 and expanding every year, WNSR is a space for the New School community to play their music, share their work, and speak their minds.
           </span>
@@ -51,7 +53,7 @@
           <span class='title'></span>
         </h1>
       </div>
-      <input class="seekbar" type="range" min="0" max="100"></input>
+      <input class="seekbar" type="range" min="0" max="100" value="0" step='0.1'></input>
       <p class='desc'></p>
       <img>
     </div>

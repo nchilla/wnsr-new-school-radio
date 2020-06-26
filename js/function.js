@@ -20,6 +20,9 @@ var analyser;
 var source;
 var loopf;
 var visualEngage=false;
+var previous;
+var activated=false;
+var atpresent=0;
 
 
 
@@ -147,6 +150,9 @@ function connectAudio(url) {
   analyser.connect(context.destination);
   analyser.smoothingTimeConstant=0.85
   analyser.fftSize = 16384;
+  audiotag.currentTime=atpresent;
+  audiotag.addEventListener('timeupdate', function(e){updateTrack(e);});
+  activated=true;
   // startVisual();
 }
 function startVisual(){
@@ -185,13 +191,28 @@ function draw(arr,min,max){
   .x(d => xPram(d.step))
   .y(d => 100-yPram(d.value))
   .curve(d3.curveCatmullRom.alpha(0.5));
-  d3.select('#wave').select('path')
-  .datum(freq)
-  .attr('d',line);
+  if(previous!==freq){
+    d3.select('#wave').select('path')
+    .datum(freq)
+    .attr('d',line);
+    previous=freq;
+  }
+
 }
 
-
-
+function updateTrack(e){
+  var newVal=audiotag.currentTime/audiotag.duration*100;
+  d3.select('.seekbar').property('value',newVal);
+  // console.log(e.timeStamp/audiotag.duration)
+  // console.log(e);
+}
+document.querySelector('.seekbar').addEventListener('change',function(e){
+  var newVal=d3.select('.seekbar').property('value')/100*audiotag.duration;
+  if(activated==true){
+    audiotag.currentTime=newVal;
+  }
+  atpresent=newVal;
+})
 
 
 
