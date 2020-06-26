@@ -54,6 +54,7 @@ p{
   font-family: neue-display-ultra, sans-serif;
   font-weight: 700;
   color: var(--tnsred);
+  cursor:pointer;
 }
 .emph{
   color: var(--tnsred);

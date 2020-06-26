@@ -315,7 +315,7 @@ function buildShows(){
       behavior: 'smooth'
     });
     scrollHandle(null);
-    d3.select('#nav').style('background-color',`rgba(255,255,255,0)`)
+    d3.select('#nav').style('background-color',`rgba(255,255,255,0)`);
 
     // d3.select('.seekbar').property('value',0);
   })
@@ -387,7 +387,15 @@ d3.selectAll('.section-link').on('click',function(event){
     behavior: 'smooth'
   });
 })
-
+d3.selectAll('.logo').on('click',function(event){
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'smooth'
+  });
+  scrollHandle(null);
+  d3.select('#nav').style('background-color',`rgba(255,255,255,0)`);
+})
 
 
 
