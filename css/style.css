@@ -6,6 +6,7 @@
   --col:calc(var(--owidth) / 12);
   --background:white;
   --stickdist:20px;
+  --browseheight:calc(var(--vh, 1vh) * 100);
 }
 
 html, body {
@@ -23,7 +24,7 @@ canvas{
   top:0;
   left:0;
   width:100vw;
-  height:100vh;
+  height:var(--browseheight);
 }
 audio{
   position:fixed;
@@ -64,7 +65,7 @@ p{
 /* containers------------ */
 .landing{
   width:100vw;
-  height:calc(100vh + 1px);
+  height:var(--browseheight);
   /* border-bottom:1px solid black; */
 }
 .content{
@@ -268,7 +269,7 @@ p{
 }
 
 /* about styling------------- */
-#about{
+#about,#partners{
   padding-top:60px;
   display:flex;
   flex-flow: row wrap;
