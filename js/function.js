@@ -325,8 +325,8 @@ function buildShows(){
   d3.selectAll('.backflip').on('click',function(event){
     pageControls('back');
   })
-
-}
+  pageControls(1);
+}//end of buildshows
 
 
 
