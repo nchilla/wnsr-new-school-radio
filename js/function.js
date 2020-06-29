@@ -447,7 +447,7 @@ function idleDraw(){
       // var dir=(yPram(sinCalc(mXVal,25,0.01,cOffset))/100*parentPos.height+parentPos.top)/window.innerHeight-mouseOffset[1];
       // var closest={ind:0,val:1000}
       for(var i=0;i<le;i++){
-        var val=sinCalc(i,30,0.01,cOffset)+10;
+        var val=sinCalc(i,30,0.01,cOffset);
         // if(i==0||i==49){
         //   val=0;
         // }
@@ -528,7 +528,7 @@ window.addEventListener('mousemove',mouseHandle)
 window.addEventListener('scroll',scrollHandle);
 window.addEventListener('resize',function(){
   scrollHandle();
-  if(resizecount<1||window.matchMedia('(hover:hover)').matches){
+  if(resizecount<0||(window.matchMedia('(hover:hover)').matches||window.matchMedia('(min-width:600px)').matches)){
     resetVh();
     resizecount++;
   }
