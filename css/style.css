@@ -7,6 +7,7 @@
   --background:white;
   --stickdist:20px;
   --browseheight:calc(var(--vh, 1vh) * 100);
+  --svgoffset:20vh;
 }
 
 html, body {
@@ -32,6 +33,9 @@ audio{
   left:20vw;
   width:60vw;
 }
+img{
+  z-index:3;
+}
 .mobile{
   display:none;
 }
@@ -42,13 +46,15 @@ h1{
   font-style: normal;
   font-size: 34px;
   line-height: 40px;
+  z-index:1;
 }
 p{
-  font-family: times,serif;
-  font-weight: 400;
+  font-family: neue-haas-unica,sans-serif;
+  font-weight: 300;
   font-style: normal;
   font-size: 25px;
   line-height: 30px;
+  z-index:2;
 }
 .logo{
   font-family: neue-display-ultra, sans-serif;
@@ -73,7 +79,23 @@ p{
   width:calc(var(--col) * 10);
   margin-left:calc(var(--col) + var(--exmarg));
   min-height:100px;
+  /* background-color: rgba(255,255,255,0.8); */
+}
+.divider{
+  position:absolute;
+  height:100%;
+  width:100vw;
   background-color: rgba(255,255,255,0.8);
+  bottom:0px;
+  left:calc(-1*(var(--col) + var(--exmarg)));
+  z-index:0;
+}
+.divider div{
+  position:absolute;
+  bottom:var(--exmarg);
+  height:0px;
+  width:100%;
+  border-bottom:1px solid black;
 }
 
 /* landing text ------------------*/
@@ -139,7 +161,7 @@ p{
   display:flex;
   flex-flow:row nowrap;
   justify-content: space-between;
-  padding-bottom: var(--exmarg);
+  padding-bottom: calc(var(--exmarg) * 2);
 }
 .seekbar{
   margin-top:20px;
@@ -183,7 +205,6 @@ p{
 }
 .togglesummary{
   margin-left:10px;
-  font-style:italic;
   /* color:rgba(0,0,0,0.3); */
   cursor: pointer;
   text-decoration-line: underline;
@@ -195,7 +216,7 @@ p{
   display:flex;
   flex-flow: row wrap;
   padding-top:60px;
-  padding-bottom:20px;
+  padding-bottom: calc(var(--exmarg) * 2);
 }
 #focused{
   order:1;
@@ -275,7 +296,7 @@ p{
   display:flex;
   flex-flow: row wrap;
   justify-content: space-between;
-  padding-bottom:20px;
+  padding-bottom: calc(var(--exmarg) * 2);
 }
 #about p{
   width:calc(var(--col) * 6);
@@ -289,10 +310,12 @@ p{
 /* svg wave ------------------ */
 #wave{
   left:0;
-  position:fixed;
+  position:absolute;
   width:100%;
-  top:20%;
-  height:80%;
+  top:0;
+  /* margin-top:20%; */
+  height:80vh;
+  top:var(--svgoffset);
   pointer-events: none;
   box-sizing: border-box;
 }
@@ -317,6 +340,9 @@ p{
 
 
 @media(max-width:768px){
+  .divider{
+    left:calc(-1*var(--exmarg));
+  }
   #nav{
     width:var(--owidth);
   }
@@ -393,10 +419,6 @@ p{
   }
 }
 @media(max-width:650px){
-  #wave{
-    top: 40%;
-    height: 60%;
-  }
   h1{
     font-size:25px;
     line-height: 30px;
@@ -421,6 +443,11 @@ p{
     height:calc(var(--col)*6);
     margin-left:calc(var(--col)*3);
     margin-bottom:20px;
+  }
+}
+@media(max-width:500px){
+  :root{
+    --svgoffset:30vh;
   }
 }
 

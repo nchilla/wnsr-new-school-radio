@@ -10,6 +10,11 @@ var currentAudio;
 var playing=false;
 var showDesc=true;
 var currentPage=1;
+var cOffset=0;
+var mouseOffset=[0.5,0.5];
+var tDur=500;
+var idleLoop;
+var idleTiming={memory:99,waiting:false}
 
 //audiocontext definitions
 var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
@@ -30,12 +35,13 @@ function resetVh(){
   var vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
-
+firedOnce=false;
 function startUp(){
   resetVh();
   rsslinks.forEach((item, i) => {
     rssFetch(item);
   });
+  idleDraw();
 }
 function rssFetch(link){
   //thanks to css tricks for this rss fetch code
@@ -121,6 +127,8 @@ function episode(data){
   }else{
     ep.select('.kicker').html('Play — ');
   }
+  d3.selectAll('.ep-preview').style('color','black')
+  d3.selectAll('.ep-preview').filter(function(d,i){if(d.title==data.title){return true}}).style('color','var(--tnsred)')
   atpresent=0;
   connectAudio(data.audio)
   // liveAudio(data.audio);
@@ -159,11 +167,16 @@ function toggleAudio(){
       startVisual();
       visualEngage=true;
     }
+    window.cancelAnimationFrame(idleLoop);
+    idleTiming.memory=0;
     audiotag.play();
     d3.select('#playtoggle').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-1" width="70.19" height="225.09"/><rect class="cls-1" x="124.74" width="70.19" height="225.09"/></g></g></svg>');
+    playing=true;
   }else{
     audiotag.pause();
     d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
+    playing=false;
+    idleDraw();
   }
 }
 
@@ -188,6 +201,7 @@ function connectAudio(url) {
     audiotag.currentTime=atpresent;
     updateTrack();
     audiotag.pause();
+    idleDraw();
     d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
     // toggleAudio();
   })
@@ -198,7 +212,7 @@ function startVisual(){
   var bufferLength = analyser.frequencyBinCount;
   var dataArray = new Uint8Array(bufferLength);
   function updateDisplay() {
-    loopf=requestAnimationFrame(updateDisplay);
+    loopf=window.requestAnimationFrame(updateDisplay);
     analyser.getByteFrequencyData(dataArray);
     draw(dataArray.slice(100,150),-100,100);
 
@@ -209,7 +223,9 @@ function startVisual(){
   updateDisplay();
   // audiotag.play();
 }
+var pathcount=0
 function draw(arr,min,max){
+  pathcount++;
   var sliced=arr
   var mean=d3.mean(sliced);
   sliced[0]=mean;
@@ -236,7 +252,6 @@ function draw(arr,min,max){
     .attr('d',line);
     previous=freq;
   }
-
 }
 
 function updateTrack(){
@@ -369,9 +384,15 @@ function scrollHandle(e){
       d3.select(scroll[i]).style('opacity',0);
       d3.select(fixed[i]).style('opacity',1);
       d3.select('#nav').style('background-color',`rgba(255,255,255,${(i==1)?1:0})`)
+      if(i==1){
+        var top=document.querySelector('#wave').getBoundingClientRect().top;
+        d3.select('#wave').style('position','fixed').style('top',top+'px');
+      }
     }else{
       d3.select(scroll[i]).style('opacity',1);
       d3.select(fixed[i]).style('opacity',0);
+      // var wprop=document.documentElement.style.getProperty('--svgoffset')
+      d3.select('#wave').style('position','absolute').style('top','var(--svgoffset)');
     }
   });
 }
@@ -396,18 +417,121 @@ d3.selectAll('.logo').on('click',function(event){
   scrollHandle(null);
   d3.select('#nav').style('background-color',`rgba(255,255,255,0)`);
 })
+function idleDraw(){
+    idleLoop=window.requestAnimationFrame(idleDraw)
+    if(idleTiming.memory<100){
+      idleTiming.memory++;
+    }else if(idleTiming.memory==100){
+      drawingPart(true);
+      idleTiming.memory++;
+      idleTiming.waiting=true;
+      window.setTimeout(function(){idleTiming.waiting=false},tDur)
+    }else if(idleTiming.waiting==true){
+    }else{
+      drawingPart(false);
+    }
+    function drawingPart(transition){
+      var min=-100;
+      var max=100;
+      var idlePath=[];
+      var le=50;
+      var xPram=d3.scaleLinear()
+        .domain([0,le-1])
+        .range([0, 100]);
+      var yPram=d3.scaleLinear()
+        .domain([min,max])
+        .range([25, 75]);
+      // var mXVal=Math.floor(mouseOffset[0]*30);
+      // var mXRange=(x)=>{return (x>mXVal-5&&x<mXVal+5)?true:false}
+      // var parentPos=document.querySelector('#wave').getBoundingClientRect()
+      // var dir=(yPram(sinCalc(mXVal,25,0.01,cOffset))/100*parentPos.height+parentPos.top)/window.innerHeight-mouseOffset[1];
+      // var closest={ind:0,val:1000}
+      for(var i=0;i<le;i++){
+        var val=sinCalc(i,30,0.01,cOffset)+10;
+        // if(i==0||i==49){
+        //   val=0;
+        // }
+        idlePath.push({step:i,value:val})
+        // var xPos=i/50;
+        // var yPos=(yPram(val)/100*parentPos.height+parentPos.top)/window.innerHeight;
+        // var dist=trigCalc([xPos,yPos]);
+        // if(dist<closest.val){
+        //   closest.ind=i;
+        //   closest.val=dist;
+        // }
+      }
+      // idlePath.forEach((item, i) => {
+      //   if(Math.abs(i-closest.ind)<5){
+      //     var y=Math.sqrt(Math.pow(1/closest.val,2)-Math.pow(i-closest.ind,2))+closest.val/50;
+      //     item.value=y;
+      //   }
+      // });
 
 
+      // var point=[i/50,yPos];
+      // var difference=yPos-mouseOffset[1];
+      // var margin=1/trigCalc(point);
+      // if(dir<0){
+      //     val=val+margin;
+      // }else{
+      //   val=val-margin;
+      // }
+      if(cOffset>25){
+        cOffset=0;
+        console.log('reset');
+      }else{
+        cOffset=cOffset+0.02;
+      }
 
+      var t = d3.transition()
+        .duration(tDur)
+        .ease(d3.easeLinear);
+      var line=d3.line()
+      .x(d => xPram(d.step))
+      .y(d => 100-yPram(d.value))
+      .curve(d3.curveCatmullRom.alpha(0.5));
+      if(transition==true){
+        d3.select('#wave').select('path')
+        .datum(idlePath)
+        .transition(t)
+        .attr('d',line);
+      }else{
+        d3.select('#wave').select('path')
+        .datum(idlePath)
+        .attr('d',line);
+      }
+    }
+}
+function mouseHandle(e){
+  if(playing==false){
+    var xCord=e.clientX/window.innerWidth;
+    var yCord=e.clientY/window.innerHeight;
+    mouseOffset=[xCord,yCord];
+    // console.log(mouseOffset);
+  }
+}
 
+function sinCalc(t,amp,fr,off){
+  return amp*Math.sin(2*Math.PI*fr*t+off);
+}
+function trigCalc(point){
+  var a=Math.abs(point[0]-mouseOffset[0]);
+  var b=Math.abs(point[1]-mouseOffset[1]);
+  return Math.sqrt(Math.pow(a,2)+Math.pow(b,2))
+}
 
-
-
-
+$(window).on('beforeunload', function() {
+    $(window).scrollTop(0);
+});
+var resizecount=0;
+window.addEventListener('mousemove',mouseHandle)
 window.addEventListener('scroll',scrollHandle);
 window.addEventListener('resize',function(){
   scrollHandle();
-  resetVh()
+  if(resizecount<1||window.matchMedia('(hover:hover)').matches){
+    resetVh();
+    resizecount++;
+  }
 }
 );
 window.onload=startUp;
