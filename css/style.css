@@ -451,6 +451,9 @@ p{
 
 
 @media(max-width:768px){
+  .tracklist{
+    width:calc(8*var(--col));
+  }
   .divider{
     left:calc(-1*var(--exmarg));
   }

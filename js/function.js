@@ -328,11 +328,13 @@ function buildShows(){
     d3.selectAll('#focus').attr('id','')
     if(notId){
       d3.select(selNode).attr('id','focus')
-      // window.scrollTo({
-      //   top: getElemDistance(selNode)-300,
-      //   left: 0,
-      //   behavior: 'smooth'
-      // });
+      var pageOff=selNode.getBoundingClientRect().top;
+      console.log(window.pageYOffset)
+      window.scrollTo({
+        top: window.pageYOffset+pageOff-100,
+        left: 0,
+        behavior: 'smooth'
+      });
     }
 
   })
