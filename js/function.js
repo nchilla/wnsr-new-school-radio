@@ -14,7 +14,8 @@ var cOffset=0;
 var mouseOffset=[0.5,0.5];
 var tDur=500;
 var idleLoop;
-var idleTiming={memory:99,waiting:false}
+var idleTiming={memory:99,waiting:false};
+var resizingNode;
 
 //audiocontext definitions
 var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
@@ -31,15 +32,28 @@ var previous;
 var activated=false;
 var atpresent=0;
 
+function showTrack(){
+    d3.selectAll('#focus:not(.allepisodes)').attr('id','');
+    if(resizingNode==undefined){
+      resizingNode=document.querySelector('.showbox')
+      document.querySelectorAll('.showbox').forEach((item, i) => {
+        if(item.scrollHeight>resizingNode.scrollHeight){
+          resizingNode=item;
+        }
+      });
+    }
+    var showtracksize=resizingNode.scrollHeight;
+    document.documentElement.style.setProperty('--showtracksize', `${showtracksize}px`);
+}
 function resetVh(){
-  var showtracksize=document.querySelector('.showbox').scrollHeight;
   // document.documentElement.style.setProperty('--backheight','0px');
   // var docheight=$(document).height();
   var vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
-  document.documentElement.style.setProperty('--showtracksize', `${showtracksize}px`);
+  showTrack();
   // document.documentElement.style.setProperty('--backheight', `calc(${docheight}px - var(--browseheight))`);
 }
+
 firedOnce=false;
 function startUp(){
   rsslinks.forEach((item, i) => {
@@ -95,8 +109,8 @@ function domToObj(){
   buildShows();
   episode(allepisodes[0]);
   resetVh();
-
-
+  d3.select('.allepisodes').attr('id','focus')
+  // document.querySelector('.showbox').addEventListener('resize',showTrack);
 }
 
 //RSS parsing tools---------------
@@ -310,7 +324,7 @@ function buildShows(){
     }else{
       psec.append('p').attr('class','newest-header').html('More of our latest episodes')
     }
-    psec.select('.show-info').append('div').attr('class','expander')
+    psec.select('.show-info').append('div').attr('class','expander').append('div').attr('class','expbutton')
     var pagecounter=1;
     var epcounter=0;
     item.episodes.forEach((ep, e) => {
@@ -327,8 +341,8 @@ function buildShows(){
   });
   d3.select('.allepisodes').attr('id','focus')
   d3.selectAll('.epwave1').classed('epshowing',true)
-  d3.selectAll('.expander').on('click',function(event){
-    var selNode=d3.event.srcElement.parentNode.parentNode.parentNode;
+  d3.selectAll('.expbutton').on('click',function(event){
+    var selNode=d3.event.srcElement.parentNode.parentNode.parentNode.parentNode;
     var notId=(d3.select(selNode).attr('id')!=='focus')?true:false;
     d3.selectAll('#focus').attr('id','')
     if(notId){
