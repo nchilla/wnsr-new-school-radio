@@ -8,6 +8,8 @@
   --stickdist:20px;
   --browseheight:calc(var(--vh, 1vh) * 100);
   --svgoffset:20vh;
+  --backheight:0;
+  --showtracksize:0;
 }
 
 html, body {
@@ -19,6 +21,16 @@ body{
 }
 div{
   position:relative;
+}
+#background{
+  position:absolute;
+  top:var(--browseheight);
+  left:0;
+  background-color: rgba(255,255,255,0.8);
+  height:var(--backheight);
+  width:100%;
+  /* backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); */
 }
 canvas{
   position:fixed;
@@ -80,12 +92,13 @@ p{
   width:calc(var(--col) * 10);
   margin-left:calc(var(--col) + var(--exmarg));
   min-height:100px;
+  border-right:1px solid black;
   /* background-color: rgba(255,255,255,0.8); */
 }
 .divider{
   position:absolute;
   height:100%;
-  width:100vw;
+  width:calc(100vw - var(--exmarg) - var(--col));
   background-color: rgba(255,255,255,0.8);
   bottom:0px;
   left:calc(-1*(var(--col) + var(--exmarg)));
@@ -94,8 +107,9 @@ p{
 .divider div{
   position:absolute;
   bottom:0px;
-  height:0px;
+  height:100%;
   width:100%;
+  /* border-right:1px solid black; */
   border-bottom:2px solid rgba(0,0,0,0);
 }
 
@@ -219,9 +233,18 @@ p{
   margin-bottom:var(--exmarg);
 }
 .allepisodes .divider div{
-  border-bottom: unset;
+  border-bottom: 1px solid black;
 }
-
+#focus.allepisodes{
+  height:290px;
+}
+#focus{
+  height:var(--showtracksize);
+  max-height:inherit;
+}
+.showbox{
+  height:calc(var(--col) * 2);
+}
 .sector{
   min-width:100%;
   display:flex;
@@ -233,7 +256,7 @@ p{
   transition: height 0.3s;
 }
 #shows{
-  height:60px;
+  height:100px;
 }
 /* #shows .divider div{
   border-bottom:1px solid black;
@@ -256,9 +279,12 @@ p{
   display:block;
 }
 .allepisodes{
-  min-height: 100px;
+  padding-bottom:20px;
+  height: 100px;
 }
 .showbox{
+  /* height:120px; */
+  /* align-items: flex-end; */
   overflow-y: visible;
 }
 .expander{
@@ -303,10 +329,12 @@ p{
   margin-bottom:7px;
 }
 .ep-preview{
+  background-color: rgba(255,255,255,0.8);
   display:none;
   border-bottom:1px solid black;
   padding-top:7px;
   padding-bottom:7px;
+  transition:opacity 0.3s;
 }
 .epshowing::before {
     content: '► ';
@@ -319,11 +347,12 @@ p{
   color:var(--tnsred);
 }
 .sector:not(#focus) .ep-preview{
-  display:none;
+  opacity:0;
+  pointer-events: none;
 }
-.tracklist .epshowing:nth-child(6){
+/* .tracklist .epshowing:nth-child(6){
   border-bottom:none;
-}
+} */
 
 
 
@@ -591,8 +620,10 @@ input[type=range]{
 
 input[type=range]::-webkit-slider-runnable-track {
     margin-top: 4px;
-    height: 3px;
-    background-color:rgba(var(--redcomp),0.2);
+    height: 1px;
+    background-color: black;
+    /* height:3px; */
+    /* background-color:rgba(var(--redcomp),0.2); */
     /* background: #ddd;
     border: none;
     border-radius: 3px; */

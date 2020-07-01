@@ -32,12 +32,16 @@ var activated=false;
 var atpresent=0;
 
 function resetVh(){
+  var showtracksize=document.querySelector('.showbox').scrollHeight;
+  // document.documentElement.style.setProperty('--backheight','0px');
+  // var docheight=$(document).height();
   var vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
+  document.documentElement.style.setProperty('--showtracksize', `${showtracksize}px`);
+  // document.documentElement.style.setProperty('--backheight', `calc(${docheight}px - var(--browseheight))`);
 }
 firedOnce=false;
 function startUp(){
-  resetVh();
   rsslinks.forEach((item, i) => {
     rssFetch(item);
   });
@@ -90,6 +94,7 @@ function domToObj(){
   });
   buildShows();
   episode(allepisodes[0]);
+  resetVh();
 
 
 }
@@ -303,14 +308,14 @@ function buildShows(){
       psec.select('.show-info').append('span').html(item.description)
       psec.append('img').attr('src',item.image)
     }else{
-      psec.append('p').attr('class','newest-header').html('Latest episodes')
+      psec.append('p').attr('class','newest-header').html('More of our latest episodes')
     }
     psec.select('.show-info').append('div').attr('class','expander')
     var pagecounter=1;
     var epcounter=0;
     item.episodes.forEach((ep, e) => {
       psec.select('.tracklist').append('span')
-      .attr('class','ep-preview epwave'+pagecounter).datum(ep).html(ep.title);
+      .attr('class','ep-preview noselect epwave'+pagecounter).datum(ep).html(ep.title);
       epcounter++;
       if(epcounter>4){
         pagecounter++;
@@ -328,13 +333,15 @@ function buildShows(){
     d3.selectAll('#focus').attr('id','')
     if(notId){
       d3.select(selNode).attr('id','focus')
-      var pageOff=selNode.getBoundingClientRect().top;
-      console.log(window.pageYOffset)
-      window.scrollTo({
-        top: window.pageYOffset+pageOff-100,
-        left: 0,
-        behavior: 'smooth'
-      });
+      setTimeout(adjustScroll.bind(selNode),300);
+      function adjustScroll(node){
+        var pageOff=selNode.getBoundingClientRect().top;
+        window.scrollTo({
+          top: window.pageYOffset+pageOff-100,
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
     }
 
   })
