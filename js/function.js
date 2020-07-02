@@ -397,11 +397,11 @@ function buildShows(){
       pageControls(1);
       function adjustScroll(node){
         var pageOff=selNode.getBoundingClientRect().top;
-        window.scrollTo({
-          top: window.pageYOffset+pageOff-100,
-          left: 0,
-          behavior: 'smooth'
-        });
+        // window.scrollTo({
+        //   top: window.pageYOffset+pageOff-100,
+        //   left: 0,
+        //   behavior: 'smooth'
+        // });
       }
     }
 
