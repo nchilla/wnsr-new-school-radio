@@ -15,7 +15,11 @@ var mouseOffset=[0.5,0.5];
 var tDur=500;
 var idleLoop;
 var idleTiming={memory:99,waiting:false};
-var resizingNode;
+var fallbackNode;
+
+
+var months=['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+
 
 //audiocontext definitions
 var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
@@ -33,17 +37,54 @@ var activated=false;
 var atpresent=0;
 
 function showTrack(){
-    d3.selectAll('#focus:not(.allepisodes)').attr('id','');
-    if(resizingNode==undefined){
-      resizingNode=document.querySelector('.showbox')
+    //setting the height for the expanded tracklist----------------
+    if(fallbackNode==undefined){
+      fallbackNode=document.querySelector('.showbox')
       document.querySelectorAll('.showbox').forEach((item, i) => {
-        if(item.scrollHeight>resizingNode.scrollHeight){
+        if(item.scrollHeight>fallbackNode.scrollHeight){
           resizingNode=item;
         }
       });
     }
-    var showtracksize=resizingNode.scrollHeight;
+    var resizingNode=fallbackNode.scrollHeight;
+    if(document.querySelectorAll('#focus').length>0){
+      var tracksize=d3.select('#focus').select('.tracklist').node().getBoundingClientRect().height;
+      if(d3.select('#focus').classed('showbox')){
+        var imgsize=d3.select('#focus').select('img').node().getBoundingClientRect().height;
+        var headsize=0;
+      }else{
+        var headsize=d3.select('#focus').select('.newest-header').node().getBoundingClientRect().height;
+        var imgsize=0;
+      }
+      if(window.matchMedia('(max-width:650px)').matches){
+        resizingNode=tracksize+imgsize+headsize;
+      }else{
+        resizingNode=(tracksize>imgsize)?tracksize:imgsize;
+      }
+    }
+    var showtracksize=resizingNode;
     document.documentElement.style.setProperty('--showtracksize', `${showtracksize}px`);
+    //setting the heights for non-expanded tracklists---------
+    var nonfoc=d3.select('.showbox:not(#focus)')
+    console.log(nonfoc.select('img'))
+    var infoH=nonfoc.select('.show-info').node().getBoundingClientRect().height;
+    var imgH=nonfoc.select('img').node().getBoundingClientRect().height;
+    console.log(infoH,imgH)
+    if(imgH==0){
+      nonfoc.select('img').on('load',function(){
+        imgH=nonfoc.select('img').node().getBoundingClientRect().height;
+        nonfocProp()
+      })
+    }else{
+      nonfocProp()
+    }
+    function nonfocProp(){
+      if(window.matchMedia('(max-width:650px)').matches){
+        document.documentElement.style.setProperty('--nonfoc', `${infoH+imgH + 20}px`);
+      }else{
+        document.documentElement.style.setProperty('--nonfoc', `${(infoH>imgH)?infoH:imgH + 20}px`);
+      }
+    }
 }
 function resetVh(){
   // document.documentElement.style.setProperty('--backheight','0px');
@@ -99,6 +140,7 @@ function domToObj(){
     allepisodes=allepisodes.concat(rssobj[i].episodes)
 
   });
+  console.log(rssobj)
   //thanks to stackOverflow user ryandlf for this sort-by-date method
   //https://stackoverflow.com/questions/10123953/how-to-sort-an-array-by-a-date-property
   allepisodes=allepisodes.sort(function(a, b) {
@@ -305,38 +347,42 @@ function buildShows(){
     image:false,
     episodes:allepisodes
   })
-  console.log(sorted)
   var stream=d3.select('#stream')
   sorted.forEach((item, i) => {
     var options={type:'showbox'}
     if(i==0){
       options.type='allepisodes';
     }
-    stream.append('div').attr('class','sector '+options.type).style('z-index',10-i)
+    stream.append('div').attr('class','sector '+options.type).datum(item).style('z-index',10-i)
     var psec=d3.select('.sector:last-child')
     psec.append('p').attr('class','tracklist')
     psec.select('.tracklist').append('span').attr('class','show-info')
     psec.append('div').attr('class','divider').append('div')
     if(item.title){
       psec.select('.show-info').append('span').attr('class','show-title').html(item.title+'<br>')
-      psec.select('.show-info').append('span').html(item.description)
+      psec.select('.show-info').append('span').attr('class','show-desc').html(item.description)
       psec.append('img').attr('src',item.image)
     }else{
       psec.append('p').attr('class','newest-header').html('More of our latest episodes')
     }
     psec.select('.show-info').append('div').attr('class','expander').append('div').attr('class','expbutton')
+    psec.select('.expander').append('span').attr('class','show-expand pageflip noselect')
+    .append('span').attr('class','backflip').html('← ');
+    psec.select('.pageflip').append('span').attr('class','nextflip').html(' →');
     var pagecounter=1;
     var epcounter=0;
     item.episodes.forEach((ep, e) => {
+      var pubDate=parseDate(ep.pubDate)
       psec.select('.tracklist').append('span')
-      .attr('class','ep-preview noselect epwave'+pagecounter).datum(ep).html(ep.title);
+      .attr('class','ep-preview noselect epwave'+pagecounter).datum(ep).html(ep.title)
+      .append('div').attr('class','date').html(pubDate);
       epcounter++;
       if(epcounter>4){
         pagecounter++;
         epcounter=0;
       }
     });
-    // theshow.datum().pagecount=pagecounter;
+    psec.datum().pagecount=pagecounter;
 
   });
   d3.select('.allepisodes').attr('id','focus')
@@ -348,6 +394,7 @@ function buildShows(){
     if(notId){
       d3.select(selNode).attr('id','focus')
       setTimeout(adjustScroll.bind(selNode),300);
+      pageControls(1);
       function adjustScroll(node){
         var pageOff=selNode.getBoundingClientRect().top;
         window.scrollTo({
@@ -378,6 +425,13 @@ function buildShows(){
 
     // d3.select('.seekbar').property('value',0);
   })
+  d3.selectAll('.nextflip').on('click',function(event){
+    pageControls('next');
+  })
+  d3.selectAll('.backflip').on('click',function(event){
+    pageControls('back');
+  })
+  pageControls(1);
 
   stream.insert('div','.showbox').attr('id','shows').append('div').attr('class','divider').append('div')
   d3.select('#shows').append('h1').html('Our Shows')
@@ -439,22 +493,29 @@ function buildShows(){
   //
   //   // d3.select('.seekbar').property('value',0);
   // })
-  // d3.selectAll('.nextflip').on('click',function(event){
-  //   pageControls('next');
-  // })
-  // d3.selectAll('.backflip').on('click',function(event){
-  //   pageControls('back');
-  // })
-  // pageControls(1);
+
 }
 //end of buildshows
 
+function parseDate(date){
+  var data=new Date(date);
+  var presYr=new Date()
+  presYr=presYr.getUTCFullYear();
+  var month=months[data.getMonth()];
+  var day=data.getUTCDate();
+  var yr=data.getUTCFullYear();
+  if(yr==presYr){
+    return `${month} ${day}`;
+  }else{
+    return `${month} ${yr}`;
+  }
 
+}
 
 
 
 function pageControls(dir){
-  var focused=d3.select('#focused')
+  var focused=d3.select('#focus')
 
   if(dir=='next'){
     currentPage++;
@@ -466,16 +527,22 @@ function pageControls(dir){
   toPage=currentPage;
   d3.selectAll('.epshowing').classed('epshowing',false);
   d3.selectAll('.epwave'+toPage).classed('epshowing',true);
-  focused.select('.nextflip').style('display','inline');
-  focused.select('.backflip').style('display','inline');
+  focused.select('.nextflip').classed('noflip',false);
+  focused.select('.backflip').classed('noflip',false);
   if(focused.datum().pagecount<2){
-    focused.select('.nextflip').style('display','none');
-    focused.select('.backflip').style('display','none');
+    focused.select('.nextflip').classed('noflip',true);
+    focused.select('.backflip').classed('noflip',true);
   }else if(currentPage==focused.datum().pagecount){
-    focused.select('.nextflip').style('display','none');
+    focused.select('.nextflip').classed('noflip',true);
   }else if(currentPage==1){
-    focused.select('.backflip').style('display','none');
+    focused.select('.backflip').classed('noflip',true);
   }
+  sHeight=focused.node().scrollHeight
+  boxHeight=$('#focus').height()+20
+  if(sHeight>boxHeight){
+    // focused.style('height',sHeight+'px')
+  }
+  showTrack();
 }
 
 
@@ -505,9 +572,7 @@ function scrollHandle(e){
 
 d3.selectAll('.section-link').on('click',function(event){
   var linkto=d3.select(d3.event.srcElement).html().toLowerCase();
-  console.log(d3.select('#'+linkto).node())
   var dist=document.querySelector('#'+linkto).offsetTop-100;
-  console.log(dist);
   window.scrollTo({
     top: getElemDistance(d3.select('#'+linkto).node()) - 100,
     left: 0,
@@ -584,7 +649,6 @@ function idleDraw(){
       // }
       if(cOffset>25){
         cOffset=0;
-        console.log('reset');
       }else{
         cOffset=cOffset+0.02;
       }
