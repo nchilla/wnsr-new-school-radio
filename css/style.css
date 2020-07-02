@@ -470,12 +470,12 @@ p{
 
 
 /* media queries --------------*/
-@media (min-width:1000px){
+/* @media (min-width:1000px){
   h1{
     font-size: 40px;
     line-height: 45px;
   }
-}
+} */
 @media(max-width:830px){
   /* .showbox{
     height:calc(var(--col) * 3);
