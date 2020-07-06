@@ -7,7 +7,7 @@
   --background:white;
   --stickdist:20px;
   --browseheight:calc(var(--vh, 1vh) * 100);
-  --svgoffset:20vh;
+  --svgoffset:25vh;
   --backheight:0;
   --showtracksize:0;
   --nonfoc:0;
@@ -53,6 +53,7 @@ img{
 .mobile{
   display:none;
 }
+
 /* typography-------------------- */
 h1{
   font-family: neue-haas-unica,sans-serif;
@@ -94,7 +95,7 @@ p{
   width:calc(var(--col) * 10);
   margin-left:calc(var(--col) + var(--exmarg));
   min-height:100px;
-  border-right:1px solid black;
+  /* border-right:1px solid black; */
   /* background-color: rgba(255,255,255,0.8); */
 }
 .divider{
@@ -126,6 +127,8 @@ p{
   position:absolute;
   top:0;
   left:0;
+  widows: 2;
+  orphans: 2;
 }
 .menu{
   display:inline;
@@ -196,10 +199,16 @@ p{
   width:calc(var(--col) * 10);
   transform:translateY(-80%);
   top:calc(var(--exmarg) * -1);
+  /* widows: 2;
+  orphans: 2; */
+}
+.player-head{
+  margin-left: 40px;
 }
 #playtoggle{
   display:inline;
-  margin-right:40px;
+  left:-40px;
+  /* margin-right:40px; */
 }
 #playtoggle svg{
   position:absolute;
@@ -226,6 +235,7 @@ p{
   margin-bottom:20px;
 }
 .togglesummary{
+  white-space: nowrap;
   margin-left:10px;
   /* color:rgba(0,0,0,0.3); */
   cursor: pointer;
@@ -504,6 +514,7 @@ p{
     width:var(--owidth);
   }
   :root{
+    --svgoffset:20vh;
     --exmarg:30px;
   }
   #describe{
@@ -531,6 +542,9 @@ p{
   }
   .mobile{
     display:inherit;
+  }
+  .desktop{
+    display:none;
   }
 
   #about{
@@ -562,10 +576,6 @@ p{
   .episode .desc{
     width:var(--owidth);
     order:2;
-  }
-  h1{
-    font-size:25px;
-    line-height: 30px;
   }
   .episode img{
     width:100%;
@@ -615,8 +625,15 @@ p{
 
 }
 @media(max-width:500px){
+  .sdesktop{
+    display:none;
+  }
+  h1{
+    font-size:25px;
+    line-height: 30px;
+  }
   :root{
-    --svgoffset:30vh;
+    --svgoffset:20vh;
   }
   .date{
     display:none;

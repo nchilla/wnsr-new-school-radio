@@ -184,7 +184,7 @@ function episode(data){
   toggleText();
   ep.select('img').attr('src',data.image);
   if(data==allepisodes[0]){
-    ep.select('.kicker').html('Latest — ');
+    ep.select('.kicker').html('Latest Episode — ');
   }else{
     ep.select('.kicker').html('Play — ');
   }
@@ -552,11 +552,15 @@ function scrollHandle(e){
   var fixed=[document.querySelector('.logo.fixed'),document.querySelector('.menu.fixed')];
   // var logodist=document.querySelector('.logo.scroll').getBoundingClientRect().top;
   scroll.forEach((item, i) => {
+    checkPos(item,i);
+  });
+
+  function checkPos(item,i){
     var dist=item.getBoundingClientRect().top;
     if(dist<=20){
       d3.select(scroll[i]).style('opacity',0).style('pointer-events','none');
       d3.select(fixed[i]).style('opacity',1).style('pointer-events','all');
-      d3.select('#nav').style('background-color',`rgba(255,255,255,${(i==1)?1:0})`)
+      d3.select('#nav').style('background-color',`rgba(255,255,255,1)`)
       if(i==1){
         var top=document.querySelector('#wave').getBoundingClientRect().top;
         d3.select('#wave').style('position','fixed').style('top',top+'px');
@@ -564,10 +568,11 @@ function scrollHandle(e){
     }else{
       d3.select(scroll[i]).style('opacity',1).style('pointer-events','all');
       d3.select(fixed[i]).style('opacity',0).style('pointer-events','none');
+      d3.select('#nav').style('background-color',`rgba(255,255,255,0)`)
       // var wprop=document.documentElement.style.getProperty('--svgoffset')
       d3.select('#wave').style('position','absolute').style('top','var(--svgoffset)');
     }
-  });
+  }
 }
 
 d3.selectAll('.section-link').on('click',function(event){
