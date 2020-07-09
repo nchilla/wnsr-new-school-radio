@@ -22,7 +22,6 @@ var months=['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.'
 
 
 //audiocontext definitions
-var url='https://wnsr-cors.herokuapp.com/https://rss.art19.com/episodes/72a3bc7e-118a-4171-8be4-125913860ef7.mp3';
 var audiotag=document.querySelector('audio');
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 let OfflineAudioContext =window.OfflineAudioContext || window.webkitOfflineAudioContext;
@@ -245,7 +244,7 @@ function connectAudio(url) {
   context=new AudioContext();
   // context.createGain();
   audiotag.crossOrigin="anonymous";
-  audiotag.preload="auto";
+  audiotag.preload="none";
   audiotag.src=url;
   if(activated==false){
     source=context.createMediaElementSource(audiotag);
