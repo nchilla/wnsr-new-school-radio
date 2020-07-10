@@ -177,6 +177,7 @@ function tagRemove(string){
 //building dom from rss data
 function episode(data){
   var ep=d3.select('.episode');
+  audiotag.removeAttribute('src')
   ep.datum(data);
   ep.select('.title').html(data.title);
   showDesc=true;
@@ -190,7 +191,7 @@ function episode(data){
   d3.selectAll('.ep-preview').classed('sel-preview',false)
   d3.selectAll('.ep-preview').filter(function(d,i){if(d.title==data.title){return true}}).classed('sel-preview',true)
   atpresent=0;
-  connectAudio(data.audio)
+  // connectAudio(data.audio)
   // liveAudio(data.audio);
 
   ep.select('#playtoggle').on('click',function(){
@@ -222,25 +223,34 @@ function toggleText(){
 }
 
 function toggleAudio(){
-  if(audiotag.paused){
-    if(visualEngage==false){
-      startVisual();
-      visualEngage=true;
-    }
-    idleTiming.memory=0;
-    window.cancelAnimationFrame(idleLoop);
-    audiotag.play();
-    d3.select('#playtoggle').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-1" width="70.19" height="225.09"/><rect class="cls-1" x="124.74" width="70.19" height="225.09"/></g></g></svg>');
-    playing=true;
+  if(audiotag.src.length>1){
+    doTheThing();
   }else{
-    audiotag.pause();
-    d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
-    playing=false;
-    idleDraw();
+    connectAudio(d3.select('.episode').datum().audio);
+    doTheThing();
   }
+  function doTheThing(){
+    if(audiotag.paused){
+      if(visualEngage==false){
+        startVisual();
+        visualEngage=true;
+      }
+      idleTiming.memory=0;
+      window.cancelAnimationFrame(idleLoop);
+      audiotag.play();
+      d3.select('#playtoggle').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-1" width="70.19" height="225.09"/><rect class="cls-1" x="124.74" width="70.19" height="225.09"/></g></g></svg>');
+      playing=true;
+    }else{
+      audiotag.pause();
+      d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
+      playing=false;
+      idleDraw();
+    }
+  }  //end of do the thing
 }
 
 function connectAudio(url) {
+  console.log('connecting new audio')
   context=new AudioContext();
   // context.createGain();
   audiotag.crossOrigin="anonymous";
