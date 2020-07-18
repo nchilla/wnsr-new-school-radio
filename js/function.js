@@ -17,6 +17,7 @@ var idleLoop;
 var idleTiming={memory:99,waiting:false};
 var fallbackNode;
 var windowsize={hor:0,vert:0};
+var waveisstuck=false;
 
 
 var months=['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
@@ -582,15 +583,24 @@ function scrollHandle(e){
       d3.select(fixed[i]).style('opacity',1).style('pointer-events','all');
       d3.select('#nav').style('background-color',`rgba(255,255,255,1)`)
       if(i==1){
-        var top=document.querySelector('#wave').getBoundingClientRect().top;
-        d3.select('#wave').style('position','fixed').style('top',top+'px');
+        if(waveisstuck==false){
+          console.log('stuck')
+          var top=document.querySelector('#wave').getBoundingClientRect().top;
+          d3.select('#wave').style('position','fixed').style('top',top+'px');
+          waveisstuck=true;
+        }
       }
     }else{
       d3.select(scroll[i]).style('opacity',1).style('pointer-events','all');
       d3.select(fixed[i]).style('opacity',0).style('pointer-events','none');
       d3.select('#nav').style('background-color',`rgba(255,255,255,0)`)
       // var wprop=document.documentElement.style.getProperty('--svgoffset')
-      d3.select('#wave').style('position','absolute').style('top','var(--svgoffset)');
+      if(waveisstuck==true){
+        console.log('unstuck')
+        d3.select('#wave').style('position','absolute').style('top','var(--svgoffset)');
+        waveisstuck=false;
+      }
+
     }
   }
 }

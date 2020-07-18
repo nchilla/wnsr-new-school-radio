@@ -7,11 +7,12 @@
   --background:white;
   --stickdist:20px;
   --browseheight:calc(var(--vh, 1vh) * 100);
-  --svgoffset:25vh;
+  --svgoffset:calc(var(--vh, 1vh) * 25);
   --backheight:0;
   --showtracksize:0;
   --nonfoc:0;
   --adjustheight:0;
+  --border:rgba(0,0,0,1);
 }
 
 html, body {
@@ -249,7 +250,7 @@ p{
   /* padding-bottom: 20px; */
 }
 .allepisodes .divider div{
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--border);
 }
 /* #focus.allepisodes{
   height:290px;
@@ -460,7 +461,7 @@ p{
   max-width:calc(var(--col) * 3);
 }
 #about .divider div{
-  border-top: 1px solid black;
+  border-top: 1px solid var(--border);
 }
 
 
@@ -528,7 +529,7 @@ p{
     width:var(--owidth);
   }
   :root{
-    --svgoffset:20vh;
+    --svgoffset:calc(var(--vh, 1vh) * 20);
     --exmarg:30px;
   }
   #describe{
@@ -576,6 +577,10 @@ p{
   }
 }
 @media(max-width:650px){
+  :root{
+    --border:rgba(0,0,0,0);
+  }
+
 
   .episode{
     flex-flow: column nowrap;
@@ -647,7 +652,7 @@ p{
     line-height: 30px;
   }
   :root{
-    --svgoffset:20vh;
+    --svgoffset:calc(var(--vh, 1vh) * 20);
   }
   .date{
     display:none;
