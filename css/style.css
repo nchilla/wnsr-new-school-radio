@@ -472,7 +472,7 @@ p{
   width:100%;
   top:0;
   /* margin-top:20%; */
-  height:80vh;
+  height:calc(var(--vh, 1vh) * 80);
   top:var(--svgoffset);
   pointer-events: none;
   box-sizing: border-box;
@@ -580,8 +580,9 @@ p{
   :root{
     --border:rgba(0,0,0,0);
   }
-
-
+  .nextflip{
+    margin-left: 10px;
+  }
   .episode{
     flex-flow: column nowrap;
   }
@@ -649,7 +650,11 @@ p{
   }
   h1{
     font-size:25px;
-    line-height: 30px;
+    line-height: 32px;
+  }
+  p{
+    font-size:19px;
+    line-height: 26px;
   }
   :root{
     --svgoffset:calc(var(--vh, 1vh) * 20);

@@ -584,7 +584,6 @@ function scrollHandle(e){
       d3.select('#nav').style('background-color',`rgba(255,255,255,1)`)
       if(i==1){
         if(waveisstuck==false){
-          console.log('stuck')
           var top=document.querySelector('#wave').getBoundingClientRect().top;
           d3.select('#wave').style('position','fixed').style('top',top+'px');
           waveisstuck=true;
@@ -596,7 +595,6 @@ function scrollHandle(e){
       d3.select('#nav').style('background-color',`rgba(255,255,255,0)`)
       // var wprop=document.documentElement.style.getProperty('--svgoffset')
       if(waveisstuck==true){
-        console.log('unstuck')
         d3.select('#wave').style('position','absolute').style('top','var(--svgoffset)');
         waveisstuck=false;
       }
