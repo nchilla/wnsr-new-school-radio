@@ -16,6 +16,7 @@ var tDur=500;
 var idleLoop;
 var idleTiming={memory:99,waiting:false};
 var fallbackNode;
+var windowsize={hor:0,vert:0};
 
 
 var months=['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
@@ -84,8 +85,8 @@ function showTrack(){
     }
 }
 function resetVh(){
-  // document.documentElement.style.setProperty('--backheight','0px');
-  // var docheight=$(document).height();
+  windowsize.vert=window.innerHeight;
+  windowsize.hor=window.innerWidth;
   var vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
   showTrack();
@@ -731,9 +732,10 @@ $(window).on('beforeunload', function() {
 var resizecount=0;
 window.addEventListener('mousemove',mouseHandle)
 window.addEventListener('scroll',scrollHandle);
-window.addEventListener('resize',function(){
+window.addEventListener('resize',function(e){
+  console.log(e);
   scrollHandle();
-  if(resizecount<0||(window.matchMedia('(hover:hover)').matches||window.matchMedia('(min-width:600px)').matches)){
+  if((resizecount<0||windowsize.hor!==window.innerWidth)||(window.matchMedia('(hover:hover)').matches||window.matchMedia('(min-width:600px)').matches)){
     resetVh();
     resizecount++;
   }
