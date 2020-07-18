@@ -65,10 +65,8 @@ function showTrack(){
     document.documentElement.style.setProperty('--showtracksize', `${showtracksize}px`);
     //setting the heights for non-expanded tracklists---------
     var nonfoc=d3.select('.showbox:not(#focus)')
-    console.log(nonfoc.select('img'))
     var infoH=nonfoc.select('.show-info').node().getBoundingClientRect().height;
     var imgH=nonfoc.select('img').node().getBoundingClientRect().height;
-    console.log(infoH,imgH)
     if(imgH==0){
       nonfoc.select('img').on('load',function(){
         imgH=nonfoc.select('img').node().getBoundingClientRect().height;
@@ -106,7 +104,7 @@ function rssFetch(link){
   fetch(link)
   .then(response => response.text())
   .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
-  .then(data => process(data.querySelector('channel')));
+  .then(data => process({data:data.querySelector('channel'),link:link}));
 }
 function process(data){
   rssdoms.push(data)
@@ -117,14 +115,15 @@ function process(data){
 
 function domToObj(){
   rssdoms.forEach((item, i) => {
-    var d=d3.select(item);
+    var d=d3.select(item.data);
     rssobj.push({
       title:d.select('title').text(),
       description:tagRemove(d.select('description').node().childNodes[1].nodeValue),
       image:d.select('image').attr('href'),
-      episodes:[]
+      episodes:[],
+      rss:item.link
     });
-    item.querySelectorAll('item').forEach((episode, e) => {
+    item.data.querySelectorAll('item').forEach((episode, e) => {
       var ep=d3.select(episode);
       rssobj[i].episodes.push({
         title:ep.select('title').text(),
@@ -177,7 +176,7 @@ function tagRemove(string){
 //building dom from rss data
 function episode(data){
   var ep=d3.select('.episode');
-  audiotag.removeAttribute('src')
+  audiotag.removeAttribute('src');
   ep.datum(data);
   ep.select('.title').html(data.title);
   showDesc=true;
@@ -368,9 +367,16 @@ function buildShows(){
     psec.select('.tracklist').append('span').attr('class','show-info')
     psec.append('div').attr('class','divider').append('div')
     if(item.title){
-      psec.select('.show-info').append('span').attr('class','show-title').html(item.title+'<br>')
-      psec.select('.show-info').append('span').attr('class','show-desc').html(item.description)
-      psec.append('img').attr('src',item.image)
+      psec.select('.show-info').append('span').attr('class','show-title').html(item.title)
+      psec.select('.show-title').append('span').attr('class','icons');
+      var icons=psec.select('.show-title').select('.icons')
+      icons.append('a').attr('class','icon-rss').attr('href',item.rss).property('target','_blank');
+      icons.append('a').attr('class','icon-spotify');
+      icons.append('a').attr('class','icon-apple');
+      icons.append('a').attr('class','icon-stitcher');
+      psec.select('.show-title').append('br');
+      psec.select('.show-info').append('span').attr('class','show-desc').html(item.description);
+      psec.append('img').attr('src',item.image);
     }else{
       psec.append('p').attr('class','newest-header').html('More of our latest episodes')
     }
@@ -385,6 +391,10 @@ function buildShows(){
       psec.select('.tracklist').append('span')
       .attr('class','ep-preview noselect epwave'+pagecounter).datum(ep).html(ep.title)
       .append('div').attr('class','date').html(pubDate);
+      if(i==0){
+        var testep=d3.select('.ep-preview:last-of-type')
+        testep.append('div').attr('class','showlab').html(ep.series);
+      }
       epcounter++;
       if(epcounter>4){
         pagecounter++;
@@ -691,7 +701,6 @@ function mouseHandle(e){
     var xCord=e.clientX/window.innerWidth;
     var yCord=e.clientY/window.innerHeight;
     mouseOffset=[xCord,yCord];
-    // console.log(mouseOffset);
   }
 }
 //thanks to Go Make Things
@@ -730,4 +739,9 @@ window.addEventListener('resize',function(){
   }
 }
 );
+window.addEventListener("deviceorientation", orientEvent, true);
+function orientEvent(){
+  console.log('orientation event')
+  resetVh();
+}
 window.onload=startUp;

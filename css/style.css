@@ -108,6 +108,7 @@ p{
   margin-left: -100vw;
   left:calc(-1*(var(--col) + var(--exmarg)));
   z-index:0;
+  pointer-events: none;
 }
 .divider div{
   position:absolute;
@@ -375,7 +376,20 @@ p{
   padding-right: 10px;
   transition:opacity 0.3s;
   padding-right: 110px;
+  /* text-indent:20px; */
 }
+.ep-preview::first-line{
+  /* text-indent: 0px; */
+}
+.showlab{
+  font-style: normal !important;
+  color:rgba(0,0,0,0.3);
+  font-weight: 300;
+  /* margin-left:21px; */
+}
+/* .showlab::before{
+  content:' • ';
+} */
 .date{
   display:flex;
   flex-flow: column nowrap;
@@ -486,10 +500,10 @@ p{
     line-height: 45px;
   }
 } */
-@media(max-width:830px){
-  /* .showbox{
-    height:calc(var(--col) * 3);
-  } */
+@media(max-width:800px){
+  .showlab{
+    display:none;
+  }
 }
 
 @media(max-width:768px){
@@ -659,6 +673,9 @@ p{
     cursor:pointer;
     font-style:italic;
   }
+  .icons a:hover{
+    color:rgba(0,0,0,1);
+  }
 }
 
 /* clear styles on seekbar */
@@ -733,3 +750,33 @@ input[type="range"]::-moz-range-thumb{
 input[type="range"]::-moz-range-thumb:active{
   cursor:grabbing;
 }
+
+/* icon typeface */
+@font-face {
+  font-family: 'feed-icons';
+  src: url('../assets/iconfont/icons.eot?24732877');
+  src: url('../assets/iconfont/icons.eot?24732877#iefix') format('embedded-opentype'),
+       url('../assets/iconfont/icons.woff?24732877') format('woff'),
+       url('../assets/iconfont/icons.ttf?24732877') format('truetype'),
+       url('../assets/iconfont/icons.svg?24732877#fontello') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+.icons{
+  font-family:feed-icons;
+  display:inline-block;
+  font-size: 18px;
+  font-weight: normal !important;
+  font-style: normal !important;
+  color:rgba(0,0,0,0.5);
+  pointer-events: all;
+}
+.icons a{
+  display:inline-block;
+  margin-left: 10px;
+  cursor:pointer;
+}
+.icon-spotify:before { content: '\e800'; } /* '' */
+.icon-apple:before { content: ' \e802'; } /* '' */
+.icon-stitcher:before { content: ' \e803'; } /* '' */
+.icon-rss:before { content: ' \f09e'; } /* '' */
