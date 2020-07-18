@@ -657,7 +657,7 @@ p{
     line-height: 26px;
   }
   :root{
-    --svgoffset:calc(var(--vh, 1vh) * 20);
+    --svgoffset:calc(var(--vh, 1vh) * 25);
   }
   .date{
     display:none;

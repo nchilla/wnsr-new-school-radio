@@ -639,12 +639,13 @@ function idleDraw(){
       var max=100;
       var idlePath=[];
       var le=50;
+      var daRange=window.matchMedia('(min-width:500px)').matches?[25,75]:[40,60];
       var xPram=d3.scaleLinear()
         .domain([0,le-1])
         .range([0, 100]);
       var yPram=d3.scaleLinear()
         .domain([min,max])
-        .range([25, 75]);
+        .range(daRange);
       // var mXVal=Math.floor(mouseOffset[0]*30);
       // var mXRange=(x)=>{return (x>mXVal-5&&x<mXVal+5)?true:false}
       // var parentPos=document.querySelector('#wave').getBoundingClientRect()
