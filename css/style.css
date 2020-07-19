@@ -236,12 +236,14 @@ p{
   margin-right:var(--col);
   margin-bottom:20px;
 }
+
 .togglesummary{
   white-space: nowrap;
   margin-left:10px;
   /* color:rgba(0,0,0,0.3); */
   cursor: pointer;
-  text-decoration-line: underline;
+  /* text-decoration-line: underline; */
+  border-bottom:1px solid var(--tnsred);
 }
 
 #stream{
@@ -437,31 +439,41 @@ p{
 
 
 
-/* shows styling------------------*/
-
-
-
-
-
-
 /* about styling------------- */
 #about,#partners{
-  padding-top:100px;
-  display:flex;
-  flex-flow: row wrap;
-  justify-content: space-between;
-  padding-bottom: calc(var(--exmarg) * 2);
+  padding-top:40px;
+  padding-bottom:40px;
   z-index:10;
 }
-#about p{
-  width:calc(var(--col) * 6);
+.twocol{
+  margin-top:20px;
+  width:100%;
+  display:flex;
+  flex-flow:row nowrap;
+  z-index:10;
+  /* justify-content: space-between; */
 }
-#about img{
-  min-width:calc(var(--col) * 3);
-  max-width:calc(var(--col) * 3);
+.col{
+  max-width: calc(5 * var(--col));
+  min-height: 50px;
 }
+.col:first-child{
+  margin-right: var(--col);
+}
+#about a{
+  cursor:alias;
+  /* font-weight: 300; */
+  /* text-decoration: underline; */
+  /* color:var(--tnsred); */
+  border-bottom:1px solid var(--tnsred);
+}
+#about strong{
+  font-weight:600;
+}
+
 #about .divider div{
   border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 
@@ -495,12 +507,15 @@ p{
 
 
 /* media queries --------------*/
-/* @media (min-width:1000px){
-  h1{
-    font-size: 40px;
-    line-height: 45px;
+@media (max-width:1000px){
+  .twocol{
+    flex-flow: column nowrap;
   }
-} */
+  .col{
+    max-width:100%;
+    margin-bottom: 20px;
+  }
+}
 @media(max-width:800px){
   .showlab{
     display:none;
@@ -580,6 +595,12 @@ p{
   :root{
     --border:rgba(0,0,0,0);
   }
+  #about, #partners {
+    padding-top: 20px;
+}
+  #shows{
+    height:80px;
+  }
   .nextflip{
     margin-left: 10px;
   }
@@ -653,8 +674,8 @@ p{
     line-height: 32px;
   }
   p{
-    font-size:19px;
-    line-height: 26px;
+    font-size:17px;
+    line-height: 25px;
   }
   :root{
     --svgoffset:calc(var(--vh, 1vh) * 25);
@@ -666,7 +687,11 @@ p{
     padding-right:20px;
   }
 }
-
+@media(max-height:500px){
+  :root{
+    --browseheight:500px;
+  }
+}
 @media(hover:hover){
   /* on desktops and all screens where hovering is possible */
   .section-link:hover{

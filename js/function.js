@@ -742,7 +742,6 @@ var resizecount=0;
 window.addEventListener('mousemove',mouseHandle)
 window.addEventListener('scroll',scrollHandle);
 window.addEventListener('resize',function(e){
-  console.log(e);
   scrollHandle();
   if((resizecount<0||windowsize.hor!==window.innerWidth)||(window.matchMedia('(hover:hover)').matches||window.matchMedia('(min-width:600px)').matches)){
     resetVh();
@@ -752,7 +751,6 @@ window.addEventListener('resize',function(e){
 );
 window.addEventListener("deviceorientation", orientEvent, true);
 function orientEvent(){
-  console.log('orientation event')
   resetVh();
 }
 window.onload=startUp;
