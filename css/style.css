@@ -674,8 +674,8 @@ p{
     line-height: 32px;
   }
   p{
-    font-size:17px;
-    line-height: 25px;
+    font-size:19px;
+    line-height: 26px;
   }
   :root{
     --svgoffset:calc(var(--vh, 1vh) * 25);
