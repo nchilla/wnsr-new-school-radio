@@ -177,8 +177,11 @@ function tagRemove(string){
 
 //building dom from rss data
 function episode(data){
+  if(activated==true){
+    audiotag.removeAttribute('src');
+  }
   var ep=d3.select('.episode');
-  audiotag.removeAttribute('src');
+  // audiotag.src='assets/turner.mp3';
   ep.datum(data);
   ep.select('.title').html(data.title);
   showDesc=true;
@@ -224,7 +227,7 @@ function toggleText(){
 }
 
 function toggleAudio(){
-  if(audiotag.src.length>1){
+  if(audiotag.src.length>1&&activated==true){
     doTheThing();
   }else{
     connectAudio(d3.select('.episode').datum().audio);
@@ -256,7 +259,9 @@ function connectAudio(url) {
   // context.createGain();
   audiotag.crossOrigin="anonymous";
   audiotag.preload="none";
+  // audiotag.play();
   audiotag.src=url;
+  // audiotag.enabled=true;
   if(activated==false){
     source=context.createMediaElementSource(audiotag);
     analyser=context.createAnalyser();
