@@ -260,7 +260,7 @@ function connectAudio(url) {
   audiotag.crossOrigin="anonymous";
   audiotag.preload="none";
   // audiotag.play();
-  audiotag.src='https://wnsr-cors.herokuapp.com/'+url;
+  audiotag.src=url;
   // audiotag.enabled=true;
   if(activated==false){
     source=context.createMediaElementSource(audiotag);
