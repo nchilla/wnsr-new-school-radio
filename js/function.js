@@ -261,6 +261,8 @@ function connectAudio(url) {
   audiotag.preload="none";
   // audiotag.play();
   audiotag.src=url;
+  // 'https://d3eqkhna3h1t0b.cloudfront.net'
+  // 'https://wnsr-cors.herokuapp.com/'+url
   // audiotag.enabled=true;
   if(activated==false){
     source=context.createMediaElementSource(audiotag);
