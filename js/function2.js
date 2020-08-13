@@ -18,7 +18,16 @@ var idleTiming={memory:99,waiting:false};
 var fallbackNode;
 var windowsize={hor:0,vert:0};
 var waveisstuck=false;
-
+var webkit=isWebkit();
+console.log(webkit);
+function isWebkit(){
+  //currently there's a webkit bug with the web audio api and 302-redirected resources; this user agent check is to gracefully degrade the visualization in webkit browsers.
+  if(navigator.userAgent.indexOf("Safari") !== -1 &&navigator.userAgent.indexOf("Chrome") == -1 &&navigator.userAgent.indexOf("Chromium") == -1){
+    return true;
+  }else{
+    return false;
+  }
+}
 
 var months=['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
 
@@ -167,8 +176,10 @@ function domToObj(){
   episode(allepisodes[0]);
   resetVh();
   d3.select('.allepisodes').attr('id','focus')
-  // connectOffline();
 }
+
+
+
 
 //RSS parsing tools---------------
 function descVal(node){
@@ -245,7 +256,6 @@ function toggleAudio(){
   if(audiotag.src.length>1&&activated==true){
     doTheThing();
   }else{
-    connectOffline();
     connectAudio(d3.select('.episode').datum().audio);
     doTheThing();
   }
@@ -257,13 +267,18 @@ function toggleAudio(){
       }
       idleTiming.memory=0;
       window.cancelAnimationFrame(idleLoop);
-      // audiotag.play();
-      // gainNode.gain.value=0;
-      dummyTag.play();
+      audiotag.play();
+      if(webkit){
+        dummyTag.play();
+      }
+
       d3.select('#playtoggle').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-1" width="70.19" height="225.09"/><rect class="cls-1" x="124.74" width="70.19" height="225.09"/></g></g></svg>');
       playing=true;
     }else{
       audiotag.pause();
+      if(webkit){
+        dummyTag.pause();
+      }
       d3.select('#playtoggle').html('<svg id="play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon class="cls-1" points="0 112.54 0 0 97.47 56.27 194.93 112.54 97.47 168.82 0 225.09 0 112.54"/></g></g></svg>');
       playing=false;
       idleDraw();
@@ -284,24 +299,18 @@ function connectOffline(){
   dummyAn=dummyCtx.createAnalyser();
   dummySrc.connect(dummyAn);
   dummyAn.connect(gainNode);
-  // dummyAn.connect(dummyCtx.destination);
   dummyAn.fftSize = 16384;
   dummyAn.smoothingTimeConstant=0.85;
   gainNode.gain.value = 0;
-
-
-  // var volume = dummyCtx.createGain();
-  // volume.gain.value = 0;
-
-
-
-
-  // var bufferLength = dummyAn.frequencyBinCount;
-
-
-
-  // dummyTag.currentTime=0;
-
+  dummyTag.addEventListener('ended',function(e){
+    console.log('restarting dummy')
+    dummyTag.pause();
+    dummyTag.currentTime=0;
+    dummyTag.play();
+    if(audiotag.paused){
+      dummyTag.pause();
+    }
+  })
 }
 
 
@@ -316,12 +325,16 @@ function connectAudio(url) {
   audiotag.src=url;
 
   if(activated==false){
-    source=context.createMediaElementSource(audiotag);
-    analyser=context.createAnalyser();
-    source.connect(analyser);
-    analyser.connect(context.destination);
-    analyser.smoothingTimeConstant=0.85
-    analyser.fftSize = 16384;
+    if(webkit==false){
+      source=context.createMediaElementSource(audiotag);
+      analyser=context.createAnalyser();
+      source.connect(analyser);
+      analyser.connect(context.destination);
+      analyser.smoothingTimeConstant=0.85
+      analyser.fftSize = 16384;
+    }else{
+      connectOffline();
+    }
   }
   audiotag.currentTime=atpresent;
   audiotag.addEventListener('timeupdate', function(e){updateTrack();});
@@ -330,6 +343,10 @@ function connectAudio(url) {
     audiotag.currentTime=atpresent;
     updateTrack();
     audiotag.pause();
+    if(webkit){
+      dummyTag.currentTime=atpresent;
+      dummyTag.pause();
+    }
     idleTiming.memory=0;
     window.cancelAnimationFrame(idleLoop);
     idleDraw();
@@ -340,13 +357,23 @@ function connectAudio(url) {
   // startVisual();
 }
 function startVisual(){
-  var bufferLength = analyser.frequencyBinCount;
+  if(webkit){
+    var bufferLength = dummyAn.frequencyBinCount;
+  }else{
+    var bufferLength = analyser.frequencyBinCount;
+  }
+
   var dataArray = new Uint8Array(bufferLength);
   function updateDisplay() {
     loopf=window.requestAnimationFrame(updateDisplay);
     // offCtx.currentTime=context.currentTime;
     // console.log(offCtx.currentTime);
-    dummyAn.getByteFrequencyData(dataArray);
+    if(webkit){
+      dummyAn.getByteFrequencyData(dataArray);
+    }else{
+      analyser.getByteFrequencyData(dataArray);
+    }
+
     draw(dataArray.slice(100,150),-100,100);
 
   }

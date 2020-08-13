@@ -2,7 +2,7 @@ function checks(){
   var nodeToPageTag=document.querySelector('#nodetopage');
   var isSafariTag=document.querySelector('#is-safari');
   var userAgentCheck=document.querySelector('#useragent');
-  var detailedUserAgentCheck=document.querySelector('#detaileduseragent');
+  var detailedUserAgentCheck=document.querySelector('#detaileduseragent');d
 
   var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
 
