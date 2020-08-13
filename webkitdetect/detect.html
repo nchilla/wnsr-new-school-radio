@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>testing detection methods for webkit browsers</title>
+    <style media="screen">
+      #nodetopage::before{
+        content:'nodetopage: ';
+      }
+      #is-safari::before{
+        content:'isSafari: ';
+      }
+      #useragent::before{
+        content:'user agent: ';
+      }
+    </style>
+  </head>
+  <body>
+    <p>is it webkit?</p>
+    <p id='nodetopage'></p>
+    <p id='is-safari'></p>
+    <p id='useragent'></p>
+
+
+
+    <!-- <audio controls></audio> -->
+    <script src="detect.js" charset="utf-8"></script>
+  </body>
+
+</html>

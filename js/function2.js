@@ -30,12 +30,27 @@ let OfflineAudioContext =window.OfflineAudioContext || window.webkitOfflineAudio
 var context;
 var statcontext;
 var analyser;
+
 var source;
 var loopf;
 var visualEngage=false;
 var previous;
 var activated=false;
 var atpresent=0;
+
+//offline graceful degradation
+var dummyCtx;
+var dummySrc;
+var dummyAn;
+var dummyTag=document.querySelector('#dummy');
+var gainNode;
+
+
+// var onCtx;
+// var offCtx;
+// var offSrc;
+// var offlineAnalyser;
+// var offlineBuffer;
 
 function showTrack(){
     //setting the height for the expanded tracklist----------------
@@ -152,7 +167,7 @@ function domToObj(){
   episode(allepisodes[0]);
   resetVh();
   d3.select('.allepisodes').attr('id','focus')
-  // document.querySelector('.showbox').addEventListener('resize',showTrack);
+  // connectOffline();
 }
 
 //RSS parsing tools---------------
@@ -230,6 +245,7 @@ function toggleAudio(){
   if(audiotag.src.length>1&&activated==true){
     doTheThing();
   }else{
+    connectOffline();
     connectAudio(d3.select('.episode').datum().audio);
     doTheThing();
   }
@@ -241,7 +257,9 @@ function toggleAudio(){
       }
       idleTiming.memory=0;
       window.cancelAnimationFrame(idleLoop);
-      audiotag.play();
+      // audiotag.play();
+      // gainNode.gain.value=0;
+      dummyTag.play();
       d3.select('#playtoggle').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194.93 225.09"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-1" width="70.19" height="225.09"/><rect class="cls-1" x="124.74" width="70.19" height="225.09"/></g></g></svg>');
       playing=true;
     }else{
@@ -253,11 +271,48 @@ function toggleAudio(){
   }  //end of do the thing
 }
 
+function connectOffline(){
+  console.log('offline fire')
+  dummyCtx=new AudioContext();
+  dummyTag.crossOrigin="anonymous";
+  dummyTag.preload="none";
+  dummyTag.src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/858/outfoxing.mp3';
+  dummySrc=dummyCtx.createMediaElementSource(dummyTag);
+  gainNode = dummyCtx.createGain();
+  gainNode.connect(dummyCtx.destination);
+  dummySrc.connect(gainNode);
+  dummyAn=dummyCtx.createAnalyser();
+  dummySrc.connect(dummyAn);
+  dummyAn.connect(gainNode);
+  // dummyAn.connect(dummyCtx.destination);
+  dummyAn.fftSize = 16384;
+  dummyAn.smoothingTimeConstant=0.85;
+  gainNode.gain.value = 0;
+
+
+  // var volume = dummyCtx.createGain();
+  // volume.gain.value = 0;
+
+
+
+
+  // var bufferLength = dummyAn.frequencyBinCount;
+
+
+
+  // dummyTag.currentTime=0;
+
+}
+
+
+
 function connectAudio(url) {
   console.log('connecting new audio')
   context=new AudioContext();
+  // context.createGain();
   audiotag.crossOrigin="anonymous";
   audiotag.preload="none";
+  // audiotag.play();
   audiotag.src=url;
 
   if(activated==false){
@@ -289,7 +344,9 @@ function startVisual(){
   var dataArray = new Uint8Array(bufferLength);
   function updateDisplay() {
     loopf=window.requestAnimationFrame(updateDisplay);
-    analyser.getByteFrequencyData(dataArray);
+    // offCtx.currentTime=context.currentTime;
+    // console.log(offCtx.currentTime);
+    dummyAn.getByteFrequencyData(dataArray);
     draw(dataArray.slice(100,150),-100,100);
 
   }
@@ -536,8 +593,6 @@ function parseDate(date){
 
 }
 
-
-
 function pageControls(dir){
   var focused=d3.select('#focus')
 
@@ -568,8 +623,6 @@ function pageControls(dir){
   }
   showTrack();
 }
-
-
 
 function scrollHandle(e){
   var scroll=[document.querySelector('.logo.scroll'),document.querySelector('.menu.scroll')];
